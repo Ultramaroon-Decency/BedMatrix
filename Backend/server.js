@@ -66,7 +66,7 @@ app.post("/chat", async (req, res) => {
     {
       role: "system",
       content:
-        "You are BedMatrix Assistant, a helpful healthcare assistant. Answer clearly and simply. If asked about hospitals or blood banks, give general guidance, not fake data.",
+        systemPrompt,
     },
     {
       role: "user",
