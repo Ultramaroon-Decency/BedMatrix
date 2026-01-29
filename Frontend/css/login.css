@@ -1,0 +1,165 @@
+
+
+.login-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 20px;
+  border: 1px solid #e5e7eb;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.toggle-btn.active {
+  background: #3B82F6;
+  color: #fff;
+  border-color: #3B82F6;
+}
+
+.login-method {
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.hidden {
+  display: none;
+}
+
+.otp-btn {
+  margin-top: 8px;
+  background: #10B981;
+}
+
+/* ===== Hover & Click Animations ===== */
+
+/* Toggle buttons hover */
+.toggle-btn {
+  transition: 
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59,130,246,0.25);
+}
+
+/* Main buttons hover */
+.login-box button {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.login-box button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(59,130,246,0.25);
+}
+
+/* Click (press) effect */
+.login-box button:active,
+.toggle-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+/* OTP button green glow */
+.otp-btn:hover {
+  box-shadow: 0 10px 25px rgba(16,185,129,0.35);
+}
+
+/* ===== HOVER + PRESS ANIMATION (FINAL) ===== */
+
+/* Primary buttons (Login / OTP) */
+.login-box button {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.login-box button:hover {
+  background: #2563EB;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(59,130,246,0.3);
+}
+
+.login-box button:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+/* Toggle buttons (Email / Phone) */
+.login-toggle .toggle-btn {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.login-toggle .toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59,130,246,0.25);
+}
+
+/* OTP button special glow */
+.otp-btn:hover {
+  background: #059669;
+  box-shadow: 0 12px 28px rgba(16,185,129,0.35);
+}
+
+.form-panel {
+  background: #ffffff;
+  transition: background-color 0.3s ease;
+}
+
+.form-panel:hover {
+  background: #344141; /* light BedMatrix blue */
+}
+.social-icons a i {
+  font-size: 1.7rem;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;   /* centers icons horizontally */
+  align-items: center;
+  gap: 12px;
+}
+
+.social-icons a {
+  display: flex;             /* VERY IMPORTANT */
+  align-items: center;       /* vertical center */
+  justify-content: center;   /* horizontal center */
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  border: 1px solid #E5E7EB;
+}
+/* ===== Login panel hover text color ===== */
+
+/* Smooth transition */
+.login-box h2,
+.login-box span {
+  transition: color 0.3s ease;
+}
+
+/* When hovering the right panel */
+.form-panel:hover .login-box h2 {
+  color: #E0F2FE; /* light blue / white-ish */
+}
+
+.form-panel:hover .login-box span {
+  color: #c7ddf8; /* softer blue */
+}
+
+
