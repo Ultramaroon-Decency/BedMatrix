@@ -628,6 +628,18 @@
   "ward"
 ];
 
+const ALLOWED_SMALL_TALK = [
+  "hi",
+  "hello",
+  "hey",
+  "thanks",
+  "thank you",
+  "bye",
+  "goodbye",
+  "ok",
+  "okay"
+];
+
 
     // bot reply (kept short)
     async function botReply(rawInput) {
@@ -638,13 +650,16 @@ const isHealthcareQuery = HEALTHCARE_KEYWORDS.some(keyword =>
   input.includes(keyword)
 );
 
-if (!isHealthcareQuery) {
-  addMessage(
-    "🩺 I’m designed to help with healthcare-related questions only — such as hospitals, bed availability, emergencies, or blood banks. Please ask something related to healthcare.",
-    "bot"
-  );
-  return;
+const isSmallTalk = ALLOWED_SMALL_TALK.some(word =>
+  input === word || input.startsWith(word)
+);
+
+// 🚧 Block ONLY if it's neither healthcare nor small talk
+if (!isHealthcareQuery && !isSmallTalk) {
+  // Let AI gently redirect instead of frontend
+  // → do NOT return here
 }
+
 
 
 
