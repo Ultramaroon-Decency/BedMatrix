@@ -1,330 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BedMatrix | Official Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/login.css">
 
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>        <!--https://boxicons.com/ -->
 
-  <!-- Inter font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Boxicons -->
-  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
-  <style>
-
-/* Toggle buttons */
-.login-toggle {
-  display: flex;
-  gap: 0.6rem;
-  margin-bottom: 1rem;
-}
-
-.toggle-btn {
-  flex: 1;
-  padding: 0.6rem;
-  border-radius: 10px;
-  border: 1px solid #E5E7EB;
-  background: #F9FAFB;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.toggle-btn.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
-
-/* Login method containers */
-.login-method {
-  margin-top: 0.5rem;
-}
-
-/* Hide utility */
-.hidden {
-  display: none;
-}
-
-/* OTP button */
-.otp-btn {
-  background: var(--secondary);
-  margin-top: 0.8rem;
-}
-
-.otp-btn:hover {
-  background: #059669;
-}
-
-/* Button wrapper */
-.action-buttons {
-  margin-top: 1rem;
-}
-
-
-    :root{
-      --primary:#3B82F6;
-      --secondary:#10B981;
-      --bg:#F9FAFB;
-      --text:#1F2937;
-      --muted:#6B7280;
-      --white:#ffffff;
-    }
-
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:'Inter',sans-serif;
-    }
-
-    body{
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background: linear-gradient(135deg, #316bb6,#E0F2FE,#3b6baa);
-      padding:1rem;
-    }
-
-    .container{
-      width:900px;
-      max-width:100%;
-      min-height:520px;
-      background:var(--white);
-      border-radius:20px;
-      box-shadow:0 20px 50px rgba(0,0,0,.1);
-      overflow:hidden;
-      display:flex;
-    }
-
-    /* LEFT PANEL */
-    .info-panel{
-      width:45%;
-      background:linear-gradient(160deg,var(--primary),var(--secondary));
-      color:white;
-      padding:3rem;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:1.2rem;
-    }
-
-    .info-panel h1{
-      font-size:2rem;
-      font-weight:700;
-    }
-
-    .info-panel p{
-      font-size:1rem;
-      opacity:.95;
-      line-height:1.6;
-    }
-
-    /* RIGHT PANEL */
-    .form-panel{
-      width:55%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:2rem;
-    }
-
-    .login-box{
-      width:100%;
-      max-width:360px;
-    }
-
-    .login-box h2{
-      font-size:1.6rem;
-      font-weight:700;
-      color:var(--text);
-      margin-bottom:.5rem;
-    }
-
-    .login-box span{
-      font-size:.9rem;
-      color:var(--muted);
-    }
-
-    .social-icons{
-      display:flex;
-      gap:.6rem;
-      margin:1.2rem 0;
-    }
-
-    .social-icons a{
-      width:42px;
-      height:42px;
-      border-radius:10px;
-      border:1px solid #E5E7EB;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:var(--text);
-      font-size:1.2rem;
-      transition:.2s;
-    }
-
-    .social-icons a:hover{
-      background:var(--primary);
-      color:white;
-      border-color:var(--primary);
-    }
-
-    .divider{
-      display:flex;
-      align-items:center;
-      gap:.6rem;
-      margin:1rem 0;
-      color:#9CA3AF;
-      font-size:.8rem;
-    }
-
-    .divider::before,
-    .divider::after{
-      content:'';
-      flex:1;
-      height:1px;
-      background:#E5E7EB;
-    }
-
-    .login-box input{
-      width:100%;
-      padding:.75rem .9rem;
-      margin:.6rem 0;
-      border-radius:10px;
-      border:1px solid #E5E7EB;
-      font-size:.9rem;
-    }
-
-    .login-box input:focus{
-      outline:none;
-      border-color:var(--primary);
-    }
-
-    .login-box a{
-      display:block;
-      text-align:right;
-      font-size:.85rem;
-      margin-top:.3rem;
-      color:var(--primary);
-      text-decoration:none;
-    }
-
-    .login-box button{
-      width:100%;
-      margin-top:1.2rem;
-      padding:.8rem;
-      border:none;
-      border-radius:12px;
-      background:var(--primary);
-      color:white;
-      font-weight:600;
-      cursor:pointer;
-      transition:.2s;
-    }
-
-    .login-box button:hover{
-      background:#2563EB;
-    }
-
-    /* RESPONSIVE */
-    @media(max-width:800px){
-      .container{
-        flex-direction:column;
-      }
-
-      .info-panel{
-        width:100%;
-        padding:2rem;
-        text-align:center;
-      }
-
-      .form-panel{
-        width:100%;
-      }
-    }
-  </style>
+    <title>Bedmatrix Login</title>
 </head>
 
 <body>
 
-  <div class="container">
-
-    <!-- LEFT INFO -->
-    <div class="info-panel">
-      <h1>🛏️ BedMatrix</h1>
-      <p>
-        Secure access for hospital officials and administrators.
-        Manage bed availability, emergencies, and blood bank data in real time.
-      </p>
-    </div>
-
-    <!-- RIGHT LOGIN -->
-    <div class="form-panel">
-      <div class="login-box">
-        <h2>Official Login</h2>
-        <span>Login using your credentials</span>
-
-        <div class="social-icons">
-          <a href="#"><i class='bx bxl-google'></i></a>
-          <a href="#"><i class='bx bxl-github'></i></a>
+    <div class="container" id="container">
+        <div class="form-container sign-up">
+            <form>
+                <h1>Create Account</h1>
+                <div class="social-icons">
+                    <a href="#" class="icons"><i class='bx bxl-google'></i></a>
+                    <a href="#" class="icons"><i class='bx bxl-facebook'></i></a>
+                    <a href="#" class="icons"><i class='bx bxl-github'></i></a>
+                    <a href="#" class="icons"><i class='bx bxl-linkedin'></i></a>
+                </div>
+                <span>Register with E-mail</span>
+                <input type="text" placeholder="Name">
+                <input type="email" placeholder="Enter E-mail">
+                <input type="password" placeholder="Enter Password">
+                <button>Sign Up</button>
+            </form>
         </div>
 
-  
 
-  <div class="divider">or</div>
-
-  <!-- 🔁 STEP 2.1 STARTS HERE -->
-  <!-- 🔁 LOGIN MODE TOGGLE -->
-<div class="login-toggle">
-  <button type="button" class="toggle-btn active" id="emailMode">
-    Email Login
-  </button>       
-  <button type="button" class="toggle-btn" id="phoneMode">
-    Phone Login
-  </button>
-</div>
-
-<!-- EMAIL LOGIN -->
-<div class="login-method" id="email-login">
-  <input type="email" placeholder="Official Email" />
-  <input type="password" placeholder="Password" />
-</div>
-
-<!-- PHONE LOGIN -->
-<div class="login-method hidden" id="phone-login">
-  <input type="tel" placeholder="Phone Number" />
-  <input type="text" placeholder="Enter OTP" />
-</div>
-
-<a href="#">Forgot password?</a>
-
-<!-- ACTION BUTTONS -->
-<div class="action-buttons">
-  <button id="loginBtn">Login</button>
-  <button type="button" class="otp-btn hidden" id="otpBtn">
-    Send OTP
-  </button>
-  <p id="otpStatus" style="font-size:0.85rem; color:#10B981; display:none;">
-  OTP sent successfully
-</p>
-
-</div>
+        <div class="form-container sign-in">
+            <form>
+                <h1>Sign In</h1>
+                <div class="social-icons">
+                    <a href="#" class="icons"><i class='bx bxl-google'></i></a>
+                    <a href="#" class="icons"><i class='bx bxl-facebook'></i></a>
+                    <a href="#" class="icons"><i class='bx bxl-github'></i></a>
+                    <a href="#" class="icons"><i class='bx bxl-linkedin'></i></a>
+                </div>
+                <span>Login With Email & Password</span>
+                <input type="email" placeholder="Enter E-mail">
+                <input type="password" placeholder="Enter Password">
+                <a href="#">Forget Password?</a>
+                <button>Sign In</button>
+            </form>
+        </div>
 
 
-  
-</div>
-
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Welcome To <br>Bedmatrix</h1>
+                    <p>Sign in With ID & Passowrd</p>
+                    <button class="hidden" id="login">Sign In</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Official Login</h1>
+                    <p>Only employees with registered email can sign in</p>
+                    <button class="hidden" id="register">Sign Up</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-  </div>
-<script src="js/login.js"></script>
-
+    <script src="js/login.js"></script>
 </body>
+
 </html>
