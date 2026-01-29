@@ -612,29 +612,146 @@
         addMessage("Location access denied or failed. Please allow location access or ask by name.", 'bot');
       }, { enableHighAccuracy:true, timeout:10000, maximumAge:60000 });
     }
+    const HEALTHCARE_KEYWORDS = [
+  "hospital",
+  "bed",
+  "icu",
+  "emergency",
+  "blood",
+  "blood bank",
+  "donation",
+  "ambulance",
+  "health",
+  "medical",
+  "doctor",
+  "patient",
+  "ward"
+];
+
 
     // bot reply (kept short)
-    function botReply(rawInput){
-      const input = (rawInput || '').toLowerCase();
-      if (input.includes("nearest blood") || input.includes("nearest blood bank") || input.includes("closest blood")) { replyWithNearestBloodBank(); return; }
-      const groupMatch = rawInput.match(/(a\+|a-|b\+|b-|o\+|o-|ab\+|ab-)/i);
-      if(groupMatch){ const group = groupMatch[0].toUpperCase(); const banks = banksWithGroup(group);
-        if(banks.length === 0) addMessage(`No blood banks list ${group} currently.`, 'bot');
-        else { addMessage(`${group} available at: ${banks.map(b=>b.name+' ('+b.location+')').join('; ')}`, 'bot'); map.setView([banks[0].lat, banks[0].lon], 14); bloodBankMarkers[banks[0].id].openPopup(); } return;
-      }
-      if (input.includes("nearest hospital") || input.includes("nearby hospital")) {
-        if(!navigator.geolocation){ addMessage("Geolocation unavailable. Please search manually.", 'bot'); return; }
-        addMessage("Locating nearest hospital... (allow location)", 'bot');
-        navigator.geolocation.getCurrentPosition(pos => {
-          const lat = pos.coords.latitude; const lon = pos.coords.longitude; let min = Infinity; let nearest = null;
-          hospitals.forEach(h => { const d = haversine(lat, lon, h.lat, h.lon); if(d < min){ min = d; nearest = { h, d }; } });
-          if(nearest){ addMessage(`Nearest hospital: ${nearest.h.name} (~${nearest.d.toFixed(2)} km). Contact: ${nearest.h.contact}`, 'bot'); map.setView([nearest.h.lat, nearest.h.lon], 14); hospitalMarkers[nearest.h.id].openPopup(); } else addMessage("No hospitals found.", 'bot');
-        }, err => addMessage("Location denied.", 'bot'), { enableHighAccuracy:true, timeout:10000 });
-        return;
-      }
-      if (input.includes("bed") || input.includes("availability")){ addMessage("Use the Search & Filter panel to find hospitals or ask me for nearest hospital/blood bank.", 'bot'); return; }
-      addMessage("Try: 'Nearest blood bank', 'Is O+ available?', 'Nearest hospital', or 'Emergency'.", 'bot');
+    async function botReply(rawInput) {
+  const input = (rawInput || "").toLowerCase();
+
+  // 🚧 DOMAIN GUARD: healthcare-only
+const isHealthcareQuery = HEALTHCARE_KEYWORDS.some(keyword =>
+  input.includes(keyword)
+);
+
+if (!isHealthcareQuery) {
+  addMessage(
+    "🩺 I’m designed to help with healthcare-related questions only — such as hospitals, bed availability, emergencies, or blood banks. Please ask something related to healthcare.",
+    "bot"
+  );
+  return;
+}
+
+
+
+  /* ===============================
+     RULE-BASED (FAST & PRECISE)
+     =============================== */
+
+  // Nearest blood bank
+  if (
+    input.includes("nearest blood") ||
+    input.includes("nearest blood bank") ||
+    input.includes("closest blood")
+  ) {
+    replyWithNearestBloodBank();
+    return;
+  }
+
+  // Blood group availability (A+, O-, etc.)
+  const groupMatch = rawInput.match(/(a\+|a-|b\+|b-|o\+|o-|ab\+|ab-)/i);
+  if (groupMatch) {
+    const group = groupMatch[0].toUpperCase();
+    const banks = banksWithGroup(group);
+
+    if (banks.length === 0) {
+      addMessage(`No blood banks currently list ${group}.`, "bot");
+    } else {
+      addMessage(
+        `${group} is available at: ${banks
+          .map((b) => `${b.name} (${b.location})`)
+          .join("; ")}`,
+        "bot"
+      );
+      map.setView([banks[0].lat, banks[0].lon], 14);
+      bloodBankMarkers[banks[0].id].openPopup();
     }
+    return;
+  }
+
+  // Nearest hospital
+  if (input.includes("nearest hospital") || input.includes("nearby hospital")) {
+    if (!navigator.geolocation) {
+      addMessage("Geolocation unavailable. Please search manually.", "bot");
+      return;
+    }
+
+    addMessage("Locating nearest hospital... (allow location)", "bot");
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+
+        let min = Infinity;
+        let nearest = null;
+
+        hospitals.forEach((h) => {
+          const d = haversine(lat, lon, h.lat, h.lon);
+          if (d < min) {
+            min = d;
+            nearest = { h, d };
+          }
+        });
+
+        if (nearest) {
+          addMessage(
+            `Nearest hospital: ${nearest.h.name} (~${nearest.d.toFixed(
+              2
+            )} km). Contact: ${nearest.h.contact}`,
+            "bot"
+          );
+          map.setView([nearest.h.lat, nearest.h.lon], 14);
+          hospitalMarkers[nearest.h.id].openPopup();
+        } else {
+          addMessage("No hospitals found.", "bot");
+        }
+      },
+      () => addMessage("Location access denied.", "bot"),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+    return;
+  }
+
+  /* ===============================
+     AI FALLBACK (SMART & FLEXIBLE)
+     =============================== */
+
+  addMessage("Typing...", "bot");
+
+  try {
+    const res = await fetch("http://localhost:3000/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: rawInput }),
+    });
+
+    const data = await res.json();
+
+    // remove "Typing..."
+    chatBody.removeChild(chatBody.lastChild);
+
+    addMessage(data.reply, "bot");
+  } catch (err) {
+    chatBody.removeChild(chatBody.lastChild);
+    addMessage("⚠️ AI backend not reachable", "bot");
+  }
+}
+
 
     
     document.getElementById('user-input').addEventListener('keydown', function(e){ if(e.key==='Enter') sendMessage(); });
