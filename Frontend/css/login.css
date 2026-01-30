@@ -8,7 +8,7 @@
 }
 
 body{
-    background-color: rgb(28, 25, 25);
+    background-color: rgba(11, 10, 10, 0.992);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -39,14 +39,14 @@ body{
 }
 
 .container a{
-    color: #333;
+    color: #252424;
     font-size: 13px;
     text-decoration: none;
     margin: 15px 0 10px;
 }
 
 .container button{
-    background-color: rgb(13, 110, 255);
+    background-color: rgb(2, 5, 8);
     color: #fff;
     font-size: 12px;
     padding: 10px 45px;
@@ -57,6 +57,7 @@ body{
     text-transform: uppercase;
     margin-top: 10px;
     cursor: pointer;
+    
 }
 
 .container button.hidden{
@@ -201,4 +202,12 @@ body{
 .toggle-right{
     right: 0;
     transform: translateX(0);
+}
+.container button {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container button:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
 }
