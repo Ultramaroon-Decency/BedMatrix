@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
   <style>
+    
     /* 🗺️ Ensure map layers & markers are visible */
 #map {
   position: relative;
@@ -158,6 +159,23 @@ nav {
 
     footer { background: var(--white); text-align:center; padding:1.5rem; margin-top:2rem; box-shadow:0 -2px 6px rgba(0,0,0,0.06);}
     footer p { color:#4B5563; font-size:0.95rem; }
+    .resource-box{
+  font-size:0.8rem;
+  margin-top:6px;
+  color:#374151;
+}
+
+.room-table{
+  margin-top:6px;
+  font-size:0.75rem;
+  width:100%;
+  border-collapse:collapse;
+}
+
+.room-table td{
+  border-top:1px solid #E5E7EB;
+  padding:2px 4px;
+}
 
   </style>
 </head>
@@ -404,24 +422,162 @@ nav {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
 
     // SAMPLE hospitals (now include wards for filtering)
-    const hospitals = [
-      { id:'H1', name: "AIIMS Hospital", lat:28.5672, lon:77.2100, contact:"+91-11-2658-8500", wards:{General:25, ICU:2, Emergency:8, Operation:1} },
-      { id:'H2', name: "Fortis Hospital", lat:28.5562, lon:77.1000, contact:"+91-11-4123-4567", wards:{General:10, ICU:1, Emergency:2, Operation:0} },
-      { id:'H3', name: "Safdarjung Hospital", lat:28.5675, lon:77.2097, contact:"+91-11-2610-3284", wards:{General:4, ICU:0, Emergency:1, Operation:0} },
-      { id:'H4', name: "Max Healthcare", lat:28.6280, lon:77.2180, contact:"+91-11-4286-1000", wards:{General:6, ICU:3, Emergency:1, Operation:2} }
-    ];
+   const hospitals = [
+
+{
+  id:'H1',
+  name:"AIIMS Hospital",
+  lat:28.5672,
+  lon:77.2100,
+  contact:"+91-11-2658-8500",
+
+  wards:{General:25, ICU:2, Emergency:8, Operation:1},
+
+  resources:{ oxygen:40, iv:25, trolley:8, ambulance:4 },
+
+  rooms:[
+    {type:"General Ward", price:800, available:12},
+    {type:"Semi Private", price:1500, available:6},
+    {type:"Private", price:3000, available:4},
+    {type:"Deluxe", price:5000, available:2}
+  ]
+},
+
+{
+  id:'H2',
+  name:"Fortis Hospital",
+  lat:28.5562,
+  lon:77.1000,
+  contact:"+91-11-4123-4567",
+
+  wards:{General:18, ICU:5, Emergency:4, Operation:2},
+
+  resources:{ oxygen:32, iv:20, trolley:6, ambulance:3 },
+
+  rooms:[
+    {type:"General Ward", price:1000, available:8},
+    {type:"Semi Private", price:1800, available:5},
+    {type:"Private", price:3500, available:3},
+    {type:"Deluxe", price:6000, available:2},
+    {type:"VIP", price:9000, available:1}
+  ]
+},
+
+{
+  id:'H3',
+  name:"Safdarjung Hospital",
+  lat:28.5675,
+  lon:77.2097,
+  contact:"+91-11-2610-3284",
+
+  wards:{General:35, ICU:1, Emergency:10, Operation:0},
+
+  resources:{ oxygen:50, iv:40, trolley:12, ambulance:5 },
+
+  rooms:[
+    {type:"General Ward", price:500, available:20},
+    {type:"Semi Private", price:1200, available:10},
+    {type:"Private", price:2500, available:5}
+  ]
+},
+
+{
+  id:'H4',
+  name:"Max Healthcare Saket",
+  lat:28.5286,
+  lon:77.2167,
+  contact:"+91-11-2651-5050",
+
+  wards:{General:12, ICU:6, Emergency:3, Operation:2},
+
+  resources:{ oxygen:22, iv:15, trolley:5, ambulance:2 },
+
+  rooms:[
+    {type:"Private", price:4000, available:6},
+    {type:"Deluxe", price:6500, available:4},
+    {type:"Super Deluxe", price:9000, available:2},
+    {type:"VIP", price:12000, available:1}
+  ]
+},
+
+{
+  id:'H5',
+  name:"Apollo Hospital Delhi",
+  lat:28.5420,
+  lon:77.2835,
+  contact:"+91-11-2692-5858",
+
+  wards:{General:20, ICU:4, Emergency:6, Operation:3},
+
+  resources:{ oxygen:35, iv:22, trolley:7, ambulance:4 },
+
+  rooms:[
+    {type:"General Ward", price:1200, available:10},
+    {type:"Private", price:4200, available:5},
+    {type:"Deluxe", price:7000, available:3},
+    {type:"VIP", price:11000, available:2}
+  ]
+},
+
+{
+  id:'H6',
+  name:"BLK-Max Super Specialty",
+  lat:28.6434,
+  lon:77.1890,
+  contact:"+91-11-3040-3040",
+
+  wards:{General:14, ICU:7, Emergency:5, Operation:2},
+
+  resources:{ oxygen:28, iv:18, trolley:6, ambulance:3 },
+
+  rooms:[
+    {type:"Private", price:3800, available:6},
+    {type:"Deluxe", price:6200, available:4},
+    {type:"Super Deluxe", price:9500, available:2},
+    {type:"VVIP", price:15000, available:1}
+  ]
+}
+
+];
+
 
     // create marker layer group & refs
     const hospitalLayer = L.layerGroup().addTo(map);
     const hospitalMarkers = {}; // id -> marker
 
-    hospitals.forEach(h => {
-      const popup = `<b>${h.name}</b><br>Contact: ${h.contact}<br>
-                     <small>General: ${h.wards.General} • ICU: ${h.wards.ICU} • Emergency: ${h.wards.Emergency} • Operation: ${h.wards.Operation}</small>`;
-      const m = L.marker([h.lat, h.lon]).bindPopup(popup);
-      hospitalMarkers[h.id] = m;
-      hospitalLayer.addLayer(m);
-    });
+   hospitals.forEach(h => {
+
+  const popup = `
+  <b>${h.name}</b><br>
+  <hr></hr>
+  Contact: ${h.contact}<br><br>
+
+ 
+  <b>Rooms:</b><br>
+  ${h.rooms.map(r => `${r.type} – ₹${r.price} (${r.available})`).join("<br>")}
+  `;
+
+
+
+
+  // ✅ CREATE MARKER (you removed this accidentally)
+  const marker = L.marker([h.lat, h.lon]).bindPopup(popup);
+
+  hospitalMarkers[h.id] = marker;
+  hospitalLayer.addLayer(marker);
+});
+
+  const redBloodIcon = L.icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+   
 
     // Blood banks (unchanged)
     const bloodBanks = [
@@ -432,7 +588,16 @@ nav {
     ];
     const bloodBankMarkers = {};
     bloodBanks.forEach(b => {
-      const marker = L.circleMarker([b.lat, b.lon], { radius:9, color:"#EF4444", weight:2, fillColor:"#FCA5A5", fillOpacity:0.9 }).addTo(map);
+      const bloodIcon = L.icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/1048/1048953.png",
+  iconSize: [28, 28],
+  iconAnchor: [14, 28],
+  popupAnchor: [0, -28]
+});
+
+const marker = L.marker([b.lat, b.lon], { icon: redBloodIcon }).addTo(map);
+
+
       const popupHtml = `<div style="font-weight:600;">${b.name}</div>
                          <div style="margin-top:6px;"><b>Location:</b> ${b.location}</div>
                          <div style="margin-top:6px;"><b>Contact:</b> ${b.contact}</div>
@@ -499,12 +664,37 @@ nav {
         div.className = 'h-card';
         div.dataset.id = h.id;
         div.innerHTML = `
-          <div class="h-left">
-            <div class="h-name">${h.name}</div>
-            <div class="h-wards">Gen: ${h.wards.General} • ICU: ${h.wards.ICU} • EMG: ${h.wards.Emergency} • Op: ${h.wards.Operation}</div>
-          </div>
-          <div class="h-right"><div class="h-status ${statusClass(h)}">${statusClass(h) === 'available' ? 'Available' : statusClass(h) === 'fewleft' ? 'Few Left' : 'Full'}</div></div>
-        `;
+  <div class="h-left">
+    <div class="h-name">${h.name}</div>
+
+    <div class="h-wards">
+      Gen: ${h.wards.General} • ICU: ${h.wards.ICU}
+    </div>
+
+    <div class="resource-box">
+      🫁 O₂: ${h.resources.oxygen} |
+      💉 IV: ${h.resources.iv} |
+      🚑 Amb: ${h.resources.ambulance}
+    </div>
+
+    <table class="room-table">
+      ${h.rooms.map(r => `
+        <tr>
+          <td>${r.type}</td>
+          <td>₹${r.price}</td>
+          <td>${r.available}</td>
+        </tr>
+      `).join("")}
+    </table>
+  </div>
+
+  <div class="h-right">
+    <div class="h-status ${statusClass(h)}">
+      ${statusClass(h) === 'available' ? 'Available' : statusClass(h) === 'fewleft' ? 'Few Left' : 'Full'}
+    </div>
+  </div>
+`;
+
         div.addEventListener('click', () => {
           map.setView([h.lat, h.lon], 14, { animate:true });
           hospitalMarkers[h.id].openPopup();
