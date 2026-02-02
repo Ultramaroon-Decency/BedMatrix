@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BedMatrix | Hospital Bed & Blood Bank Tracker</title>
 
   <!-- Google Fonts -->
@@ -12,171 +13,734 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
   <style>
-    
-    /* 🗺️ Ensure map layers & markers are visible */
-#map {
-  position: relative;
-  z-index: 1;
-}
+    /* ------------------------------------------------------------
+       🎨 BEDMATRIX MODERN PREMIUM UI - DESIGN SYSTEM
+       ------------------------------------------------------------ */
 
-/* Tile layer */
-.leaflet-tile-pane {
-  z-index: 1;
-}
-
-/* Markers & icons */
-.leaflet-marker-pane,
-.leaflet-overlay-pane,
-.leaflet-shadow-pane {
-  z-index: 5;
-}
-
-/* Controls (zoom, legend) */
-.leaflet-control {
-  z-index: 10;
-}
-
-/* Navbar still stays on top */
-nav {
-  z-index: 1000;
-}
-
-    /* 🔒 Constrain Leaflet inside the map */
-
-
+    /* 1. RESET & VARIABLES */
     :root {
-      --primary-color: #3B82F6;
-      --secondary-color: #10B981;
-      --bg-light: #F9FAFB;
-      --text-dark: #1F2937;
-      --text-gray: #4B5563;
-      --white: #FFFFFF;
+      /* Palette: Modern Deep Indigo & Medical Teal */
+      --primary: #4F46E5;
+      /* Indigo 600 */
+      --primary-dark: #4338CA;
+      /* Indigo 700 */
+      --secondary: #06B6D4;
+      /* Cyan 500 */
+      --secondary-dark: #0891B2;
+      /* Cyan 600 */
+
+      /* Accents */
+      --accent-success: #10B981;
+      --accent-warning: #F59E0B;
+      --accent-danger: #EF4444;
+
+      /* Neutrals */
+      --bg-body: #F8FAFC;
+      /* Slate 50 */
+      --bg-surface: #FFFFFF;
+      --text-main: #0F172A;
+      /* Slate 900 */
+      --text-muted: #64748B;
+      /* Slate 500 */
+      --border-light: #E2E8F0;
+      /* Slate 200 */
+
+      /* Effects */
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --font-main: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
-    * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
-    html { scroll-behavior: smooth; }
-    body { background: var(--bg-light); color:var(--text-dark); }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      background: var(--bg-body);
+      color: var(--text-main);
+      font-family: var(--font-main);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 2. TYPOGRAPHY */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      color: var(--text-main);
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    a {
+      text-decoration: none;
+      transition: 0.2s ease;
+    }
+
+    /* Utility Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fade {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+
+
+    /* 3. NAVBAR (Glassmorphism) */
     nav {
-      background: var(--white);
-      padding:1rem 2rem;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      box-shadow:0 2px 6px rgba(0,0,0,0.08);
+      background: rgba(255, 255, 255, 0.85);
+      /* Translucent */
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 1rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       position: sticky;
-      top:0;
-      z-index:1000;
-    }
-    nav h1 { color: var(--primary-color); font-weight:700; font-size:1.6rem; }
-    nav ul { list-style:none; display:flex; gap:1.2rem; align-items:center; }
-    nav ul li a { text-decoration:none; color: var(--text-dark); font-weight:500; cursor:pointer;}
-    nav ul li a:hover { color: var(--primary-color); }
-
-    section { padding: 3rem 2rem; }
-    h2.section-title { text-align:center; font-size:2.2rem; font-weight:700; margin-bottom:1.5rem; color:var(--text-dark); }
-
-    /* Hero */
-    .hero { text-align:center; padding:4rem 2rem; background: linear-gradient(to right,#E0F2FE,#F0FDFA);}
-    .hero h2 { font-size:2.4rem; font-weight:700; color:var(--text-dark); }
-    .hero p { max-width:780px; margin:0.8rem auto; color:var(--text-gray); font-size:1.05rem; }
-
-    .hero button { background: var(--primary-color); color:white; padding:0.8rem 2rem; border:none; border-radius:8px; cursor:pointer; font-weight:600; }
-
-    /* Features */
-    .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1.5rem; max-width:1200px; margin:0 auto;}
-    .feature-card { background: var(--white); padding:1.5rem; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.05); text-align:center; transition: transform 0.28s ease, box-shadow 0.28s ease;}
-    .feature-card:hover { transform:translateY(-6px); box-shadow:0 12px 30px rgba(0,0,0,0.08);}
-    .feature-icon { width:56px; height:56px; margin-bottom:0.75rem; object-fit:contain; }
-    .feature-title { font-size:1.1rem; font-weight:600; margin-bottom:0.45rem; color: var(--primary-color);}
-    .feature-desc { font-size:0.95rem; color:var(--text-gray); }
-
-    /* Dashboard Table */
-    .dashboard table { width:100%; max-width:1100px; margin:0 auto; border-collapse:collapse; box-shadow:0 4px 20px rgba(0,0,0,0.05);}
-    th,td { padding:0.9rem; text-align:center; border-bottom:1px solid #E5E7EB;}
-    th { background: var(--primary-color); color:white; font-weight:600;}
-    tr:hover { background:#F3F4F6; transition:0.2s;}
-    .status { padding:0.35rem 0.7rem; border-radius:6px; font-weight:600; display:inline-block;}
-    .available { background:#DCFCE7; color:#166534; }
-    .fewleft { background:#FEF9C3; color:#92400E; }
-    .full { background:#FEE2E2; color:#991B1B; }
-
-    /* FAQ (hover reveal) */
-    .faq-section { padding: 4rem 2rem; max-width: 900px; margin: auto; }
-    .faq-intro { text-align: center; color: var(--text-gray); font-size: 1rem; margin-bottom: 2.5rem; }
-    .faq-container { display: flex; flex-direction: column; gap: 1rem; }
-    .faq-item { background: var(--white); border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); padding: 1.2rem 1.5rem; transition: all 0.3s ease; position: relative; overflow: hidden; cursor: pointer; }
-    .faq-question { font-weight: 600; font-size: 1.05rem; color: var(--primary-color); }
-    .faq-answer { margin-top: 0.7rem; color: var(--text-gray); font-size: 0.95rem; line-height: 1.5; max-height: 0; opacity: 0; transition: all 0.4s ease; }
-    .faq-item:hover .faq-answer { max-height: 300px; opacity: 1; }
-   /* Login */
-    .login-form { max-width:400px; margin:2rem auto; padding:2rem; background: var(--white); border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.05);}
-    .login-form input, .login-form button { width:100%; padding:0.8rem; margin:0.5rem 0; border-radius:8px; border:1px solid #D1D5DB; }
-    .login-form button { background: var(--primary-color); color:white; border:none; cursor:pointer; }
-    .login-form button:hover { background: #2563EB; transition:0.2s; }
-
-
-    /* Search & Filter panel */
-    .search-panel { max-width:1200px; margin:1.25rem auto; background:var(--white); padding:1rem; border-radius:12px; box-shadow:0 8px 30px rgba(2,6,23,.04); }
-    .controls { display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center; margin-bottom:0.75rem; }
-    .search-input { flex:1; min-width:200px; padding:0.6rem 0.8rem; border:1px solid #E6EEF8; border-radius:8px; }
-    .filters { display:flex; gap:0.75rem; align-items:center; }
-    .filter-group { display:flex; flex-direction:column; min-width:140px; font-size:0.9rem; color:var(--text-gray); }
-    .filter-label { font-size:0.8rem; color:var(--text-gray); margin-bottom:0.25rem; }
-    select { padding:0.5rem; border-radius:8px; border:1px solid #E6EEF8; background:white; }
-
-    .btn { background:var(--primary-color); color:white; border:none; padding:0.5rem 0.75rem; border-radius:8px; cursor:pointer; }
-
-    .list-and-map { display:grid; grid-template-columns:360px 1fr; gap:1rem; margin-top:0.5rem; }
-    .hospital-list { max-height:62vh; overflow:auto; padding-right:6px; display:flex; flex-direction:column; gap:0.6rem; }
-    .h-card { background:linear-gradient(180deg,#fff,#fbfdff); padding:0.75rem; border-radius:10px; border:1px solid #EEF6FF; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; cursor:pointer; }
-    .h-left { display:flex; flex-direction:column; }
-    .h-name { font-weight:600; color:var(--text-dark); }
-    .h-wards { font-size:0.85rem; color:var(--text-gray); margin-top:6px; }
-    .h-status { padding:0.25rem 0.6rem; border-radius:999px; font-weight:700; font-size:0.8rem; }
-    
-    /* Map */
-    #map { width:100%; height:64vh; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin:0;  position: relative; z-index: 1;}
-
-    /* small screens */
-    @media (max-width:920px){
-      .list-and-map { grid-template-columns:1fr; }
-      .hospital-list { order:2; max-height:40vh; }
-      #map { order:1; height:42vh; }
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: var(--shadow-sm);
     }
 
-    /* Chatbot + other styles kept as-is */
-    .chatbot-toggle { position:fixed; bottom:20px; right:20px; background:var(--secondary-color); color:white; border:none; border-radius:50%; width:60px; height:60px; font-size:1.6rem; cursor:pointer; z-index:1001; box-shadow:0 4px 15px rgba(0,0,0,0.2);}
-    .chatbot-container { position:fixed; bottom:90px; right:20px; width:360px; height:480px; background: var(--white); border-radius:16px; box-shadow:0 6px 25px rgba(0,0,0,0.3); display:none; flex-direction:column; overflow:hidden; z-index:1002;}
-    .chat-header { background: var(--primary-color); color:white; text-align:center; padding:1rem; font-weight:600; }
-    .chat-body { flex:1; padding:0.8rem; overflow-y:auto; display:flex; flex-direction:column; gap:0.5rem;}
-    .chat-msg { padding:0.6rem 1rem; border-radius:12px; max-width:80%; word-wrap:break-word;}
-    .bot-msg { background:#E0F2FE; align-self:flex-start; }
-    .user-msg { background:#DCFCE7; align-self:flex-end; }
-    .chat-input { display:flex; border-top:1px solid #E5E7EB; }
-    .chat-input input { flex:1; border:none; padding:0.8rem; outline:none; }
-    .chat-input button { border:none; background: var(--primary-color); color:white; padding:0 1rem; cursor:pointer; }
+    nav h1 {
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: -0.02em;
+    }
 
-    footer { background: var(--white); text-align:center; padding:1.5rem; margin-top:2rem; box-shadow:0 -2px 6px rgba(0,0,0,0.06);}
-    footer p { color:#4B5563; font-size:0.95rem; }
-    .resource-box{
-  font-size:0.8rem;
-  margin-top:6px;
-  color:#374151;
-}
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
 
-.room-table{
-  margin-top:6px;
-  font-size:0.75rem;
-  width:100%;
-  border-collapse:collapse;
-}
+    nav ul li a {
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.95rem;
+      position: relative;
+    }
 
-.room-table td{
-  border-top:1px solid #E5E7EB;
-  padding:2px 4px;
-}
+    nav ul li a:hover,
+    nav ul li a.active {
+      color: var(--primary);
+    }
 
+    /* Navbar Link Animated Underline */
+    nav ul li a::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background: var(--primary);
+      transition: width 0.3s ease;
+      border-radius: 2px;
+    }
+
+    nav ul li a:hover::after {
+      width: 100%;
+    }
+
+
+    /* 4. SECTIONS */
+    section {
+      padding: 4rem 5%;
+    }
+
+    h2.section-title {
+      text-align: center;
+      font-size: 2.25rem;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    /* Decorative underline for titles */
+    h2.section-title::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      margin: 0.8rem auto 0;
+      border-radius: 2px;
+    }
+
+    /* 5. HERO SECTION */
+    .hero {
+      text-align: center;
+      padding: 6rem 1rem;
+      background: radial-gradient(circle at top right, #E0E7FF 0%, transparent 40%),
+        radial-gradient(circle at bottom left, #CCFBF1 0%, transparent 40%),
+        var(--bg-body);
+      overflow: hidden;
+    }
+
+    .hero h2 {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      font-size: 1.25rem;
+      color: var(--text-muted);
+    }
+
+    .hero button {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 1rem 2.5rem;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .hero button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px -5px rgba(79, 70, 229, 0.5);
+    }
+
+    /* 6. FEATURES (Cards) */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      background: var(--bg-surface);
+      padding: 2rem;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+      border: 1px solid var(--border-light);
+      text-align: left;
+      /* Modern Left Align */
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 4px;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: #C7D2FE;
+    }
+
+    .feature-icon {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 1.5rem;
+      padding: 12px;
+      background: #EEF2FF;
+      border-radius: 16px;
+      object-fit: contain;
+    }
+
+    .feature-title {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-main);
+    }
+
+    .feature-desc {
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+
+    /* 7. DASHBOARD & SEARCH */
+    .dashboard table {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      border-collapse: separate;
+      /* For rounded corners */
+      border-spacing: 0;
+      box-shadow: var(--shadow-md);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--bg-surface);
+    }
+
+    th,
+    td {
+      padding: 1rem 1.5rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    th {
+      background: var(--bg-body);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: #F8FAFC;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-right: 6px;
+      background: currentColor;
+    }
+
+    .available {
+      background: #ECFDF5;
+      color: #059669;
+    }
+
+    .fewleft {
+      background: #FFFBEB;
+      color: #D97706;
+    }
+
+    .full {
+      background: #FEF2F2;
+      color: #DC2626;
+    }
+
+    /* Search Panel */
+    .search-panel {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: var(--bg-surface);
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-light);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .controls .search-input {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      min-width: 150px;
+    }
+
+    /* Make inputs cleaner */
+    .search-input,
+    select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      background: #F8FAFC;
+      transition: 0.2s;
+    }
+
+    .search-input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .filter-group label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .btn {
+      padding: 0.8rem 1.5rem;
+      background: var(--bg-body);
+      color: var(--text-main);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 500;
+      height: 46px;
+      /* Match input height roughly */
+      align-self: end;
+    }
+
+    .btn:hover {
+      background: #F1F5F9;
+    }
+
+    /* List & Map Layout */
+    .list-and-map {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .hospital-list {
+      max-height: 600px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    /* Scrollbar Styling */
+    .hospital-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .hospital-list::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 3px;
+    }
+
+    .hospital-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .h-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .h-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .h-card.selected {
+      border-color: var(--primary);
+      background: #EEF2FF;
+    }
+
+    .h-name {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .h-wards {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 8px;
+      margin-bottom: 0.5rem;
+    }
+
+    .resource-box {
+      font-size: 0.75rem;
+      background: #F1F5F9;
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    /* Map container */
+    #map {
+      width: 100%;
+      height: 600px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      z-index: 1;
+    }
+
+    /* 8. FAQ & LOGIN, BLOOD BANK */
+    .faq-section {
+      padding: 4rem 5%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .faq-intro {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .faq-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .faq-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .faq-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--primary);
+      border-radius: 4px 0 0 4px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .faq-item:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: #C7D2FE;
+    }
+
+    .faq-item:hover::before {
+      opacity: 1;
+    }
+
+    .faq-question {
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--text-main);
+    }
+
+    .faq-answer {
+      margin-top: 0.75rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .faq-item:hover .faq-answer {
+      max-height: 300px;
+      opacity: 1;
+    }
+
+    /* Login Form */
+    .login-form {
+      box-shadow: var(--shadow-lg);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem;
+    }
+
+    /* 9. FOOTER */
+    footer {
+      background: #1E293B;
+      /* Slate 800 */
+      color: #94A3B8;
+      padding: 3rem 1rem;
+      margin-top: 4rem;
+    }
+
+    /* 10. RESPONSIVE */
+    @media (max-width: 960px) {
+      .list-and-map {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .hero h2 {
+        font-size: 2.5rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      nav {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      nav ul {
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+
+    /* Leaflet Overrides for better aesthetics */
+    .leaflet-popup-content-wrapper {
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      font-family: var(--font-main);
+    }
+
+    .leaflet-popup-content b {
+      color: var(--primary-dark);
+      font-size: 1.1rem;
+    }
+
+
+    /* Chatbot Styles Modernized */
+    .chatbot-toggle {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      left: auto;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chatbot-toggle:hover {
+      transform: scale(1.1) translateY(-2px);
+      box-shadow: 0 10px 30px rgba(79, 70, 229, 0.5);
+    }
+
+    .chatbot-container {
+      position: fixed;
+      bottom: 90px;
+      right: 24px;
+      left: auto;
+      width: 360px;
+      height: 480px;
+      background: var(--bg-surface);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      z-index: 1002;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      padding: 1.2rem;
+    }
+
+    .bot-msg {
+      background: #EEF2FF;
+      color: var(--text-main);
+    }
+
+    .user-msg {
+      background: var(--primary);
+      color: white;
+    }
+
+    .room-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+
+    .room-table td {
+      border-bottom: 1px solid #eee;
+      padding: 4px;
+    }
   </style>
 </head>
 
@@ -190,7 +754,7 @@ nav {
       <li><a href="#features">Features</a></li>
       <li><a href="#dashboard">Dashboard</a></li>
       <li><a href="#faq">FAQ</a></li>
-      <li><a target="_blank" href="login.html">Official Login</a></li>    
+      <li><a target="_blank" href="login.html">Official Login</a></li>
       <li><a href="#map-section">Map</a></li>
       <li><a href="#blood-bank-section">Blood Banks</a></li>
     </ul>
@@ -199,7 +763,8 @@ nav {
   <!-- Hero -->
   <section class="hero" id="home">
     <h2>Real-Time Hospital Bed Availability</h2>
-    <p>Find available beds in General, ICU, Emergency, and Operation wards instantly. Your healthcare decisions simplified.</p>
+    <p>Find available beds in General, ICU, Emergency, and Operation wards instantly. Your healthcare decisions
+      simplified.</p>
   </section>
 
   <!-- Features -->
@@ -242,313 +807,353 @@ nav {
     <table>
       <thead>
         <tr>
-          <th>Hospital</th><th>General</th><th>Emergency</th><th>ICU</th><th>Operation</th><th>Status</th>
+          <th>Hospital</th>
+          <th>General</th>
+          <th>Emergency</th>
+          <th>ICU</th>
+          <th>Operation</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>AIIMS</td><td>25/50</td><td>8/15</td><td>2/10</td><td>1/5</td><td><span class="status fewleft">Few Left</span></td>
+          <td>AIIMS</td>
+          <td>25/50</td>
+          <td>8/15</td>
+          <td>2/10</td>
+          <td>1/5</td>
+          <td><span class="status fewleft">Few Left</span></td>
         </tr>
         <tr>
-          <td>Fortis</td><td>10/40</td><td>2/10</td><td>1/5</td><td>0/5</td><td><span class="status available">Available</span></td>
+          <td>Fortis</td>
+          <td>10/40</td>
+          <td>2/10</td>
+          <td>1/5</td>
+          <td>0/5</td>
+          <td><span class="status available">Available</span></td>
         </tr>
       </tbody>
     </table>
   </section>
 
   <!-- FAQ -->
-  
+
   <!-- Accordion Animation Script -->
-<script>
-  // FAQ accordion open/close animation
-  document.querySelectorAll('.faq-question').forEach((question) => {
-    question.addEventListener('click', () => {
-      const answer = question.nextElementSibling;
-      const isActive = answer.style.display === 'block';
-      // Close all
-      document.querySelectorAll('.faq-answer').forEach(a => a.style.display = 'none');
-      // Open current
-      answer.style.display = isActive ? 'none' : 'block';
-      question.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  <script>
+    // FAQ accordion open/close animation
+    document.querySelectorAll('.faq-question').forEach((question) => {
+      question.addEventListener('click', () => {
+        const answer = question.nextElementSibling;
+        const isActive = answer.style.display === 'block';
+        // Close all
+        document.querySelectorAll('.faq-answer').forEach(a => a.style.display = 'none');
+        // Open current
+        answer.style.display = isActive ? 'none' : 'block';
+        question.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
     });
-  });
-</script>
+  </script>
 
 
   <!-- Login Section -->
   <ion id="login">
- 
 
-  <!-- Official Login Form -->
-  <form class="login-form" id="official-login" style="display:none;">
-    <p style="margin-bottom:1rem;">Login with your employee credentials</p>
-    <input type="text" placeholder="Employee ID" required />
-    <input type="password" placeholder="Password" required />
-    <a href="#" style="font-size:0.85rem; color:var(--primary-color); text-decoration:none; display:block; margin-bottom:0.5rem;">Forgot Password?</a>
-    <button type="submit">Login</button>
-  </form>
-</section>
 
-<script>
-  function showLogin(type){
-    const userForm = document.getElementById('user-login');
-    const officialForm = document.getElementById('official-login');
-    const userBtn = document.getElementById('user-btn');
-    const officialBtn = document.getElementById('official-btn');
+    <!-- Official Login Form -->
+    <form class="login-form" id="official-login" style="display:none;">
+      <p style="margin-bottom:1rem;">Login with your employee credentials</p>
+      <input type="text" placeholder="Employee ID" required />
+      <input type="password" placeholder="Password" required />
+      <a href="#"
+        style="font-size:0.85rem; color:var(--primary-color); text-decoration:none; display:block; margin-bottom:0.5rem;">Forgot
+        Password?</a>
+      <button type="submit">Login</button>
+    </form>
+    </section>
 
-    if(type==='user'){
-      userForm.style.display='block';
-      officialForm.style.display='none';
-      userBtn.style.background= 'var(--primary-color)';
-      userBtn.style.color='white';
-      officialBtn.style.background='#E5E7EB';
-      officialBtn.style.color='var(--text-dark)';
-    } else {
-      userForm.style.display='none';
-      officialForm.style.display='block';
-      officialBtn.style.background= 'var(--primary-color)';
-      officialBtn.style.color='white';
-      userBtn.style.background='#E5E7EB';
-      userBtn.style.color='var(--text-dark)';
-    }
-  }
-</script>
-  <!-- Search & Filter Panel -->
-  <section class="search-panel" id="search-panel" aria-label="Search and filter hospitals">
-    <div class="controls">
-      <input id="search-input" class="search-input" type="search" placeholder="Search hospitals by name..." aria-label="Search hospitals by name" />
+    <script>
+      function showLogin(type) {
+        const userForm = document.getElementById('user-login');
+        const officialForm = document.getElementById('official-login');
+        const userBtn = document.getElementById('user-btn');
+        const officialBtn = document.getElementById('official-btn');
 
-      <div class="filters">
-        <div class="filter-group">
-          <label class="filter-label" for="ward-select">Ward</label>
-          <select id="ward-select" aria-label="Filter by ward">
-            <option value="any">Any</option>
-            <option value="General">General</option>
-            <option value="ICU">ICU</option>
-            <option value="Emergency">Emergency</option>
-            <option value="Operation">Operation</option>
-          </select>
-        </div>
+        if (type === 'user') {
+          userForm.style.display = 'block';
+          officialForm.style.display = 'none';
+          userBtn.style.background = 'var(--primary-color)';
+          userBtn.style.color = 'white';
+          officialBtn.style.background = '#E5E7EB';
+          officialBtn.style.color = 'var(--text-dark)';
+        } else {
+          userForm.style.display = 'none';
+          officialForm.style.display = 'block';
+          officialBtn.style.background = 'var(--primary-color)';
+          officialBtn.style.color = 'white';
+          userBtn.style.background = '#E5E7EB';
+          userBtn.style.color = 'var(--text-dark)';
+        }
+      }
+    </script>
+    <!-- Search & Filter Panel -->
+    <section class="search-panel" id="search-panel" aria-label="Search and filter hospitals">
+      <div class="controls">
+        <input id="search-input" class="search-input" type="search" placeholder="Search hospitals by name..."
+          aria-label="Search hospitals by name" />
 
-        <div class="filter-group">
-          <label class="filter-label" for="availability-select">Availability</label>
-          <select id="availability-select" aria-label="Filter by availability">
-            <option value="any">Any</option>
-            <option value="available">Available (&gt;10 total)</option>
-            <option value="few">Few Left (3–10)</option>
-            <option value="full">Full (&le;2)</option>
-          </select>
-        </div>
+        <div class="filters">
+          <div class="filter-group">
+            <label class="filter-label" for="ward-select">Ward</label>
+            <select id="ward-select" aria-label="Filter by ward">
+              <option value="any">Any</option>
+              <option value="General">General</option>
+              <option value="ICU">ICU</option>
+              <option value="Emergency">Emergency</option>
+              <option value="Operation">Operation</option>
+            </select>
+          </div>
 
-        <div class="filter-group">
-          <label style="visibility:hidden">reset</label>
-          <button id="reset-filters" class="btn" aria-label="Reset filters">Reset</button>
+          <div class="filter-group">
+            <label class="filter-label" for="availability-select">Availability</label>
+            <select id="availability-select" aria-label="Filter by availability">
+              <option value="any">Any</option>
+              <option value="available">Available (&gt;10 total)</option>
+              <option value="few">Few Left (3–10)</option>
+              <option value="full">Full (&le;2)</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label style="visibility:hidden">reset</label>
+            <button id="reset-filters" class="btn" aria-label="Reset filters">Reset</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="list-and-map">
-      <!-- Hospital list -->
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
-          <div style="font-weight:600;color:var(--text-gray)">Hospitals</div>
-          <div id="result-count" style="color:var(--text-gray)">Showing 0</div>
+      <div class="list-and-map">
+        <!-- Hospital list -->
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
+            <div style="font-weight:600;color:var(--text-gray)">Hospitals</div>
+            <div id="result-count" style="color:var(--text-gray)">Showing 0</div>
+          </div>
+          <div class="hospital-list" id="hospital-list" aria-live="polite"></div>
         </div>
-        <div class="hospital-list" id="hospital-list" aria-live="polite"></div>
+
+        <!-- Map -->
+        <div id="map" role="region" aria-label="Delhi hospitals and blood banks map"></div>
       </div>
-   
-      <!-- Map -->
-      <div id="map" role="region" aria-label="Delhi hospitals and blood banks map"></div>
+    </section>
+
+    <!-- Blood Banks Table -->
+    <section id="blood-bank-section">
+      <h2 style="text-align:center; margin-top:0.5rem;">🩸 Nearby Blood Banks</h2>
+      <p style="text-align:center; color:#4B5563; max-width:760px; margin:0.5rem auto 1rem;">
+        Find your nearest blood banks and check which blood groups are currently available. Click a row to center the
+        map on that blood bank.
+      </p>
+
+      <table
+        style="width:90%; max-width:940px; margin:0 auto 3rem; border-collapse:collapse; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
+        <thead>
+          <tr style="background:var(--primary-color); color:white;">
+            <th style="padding:0.9rem;">Blood Bank</th>
+            <th style="padding:0.9rem;">Location</th>
+            <th style="padding:0.9rem;">Available Blood Groups</th>
+          </tr>
+        </thead>
+        <tbody id="blood-bank-table"></tbody>
+      </table>
+    </section>
+
+    <!-- Chatbot -->
+    <button class="chatbot-toggle" onclick="toggleChatbot()" title="Open chat">💬</button>
+    <div class="chatbot-container" id="chatbot" aria-hidden="true">
+      <div class="chat-header">🩺 BedMatrix Assistant</div>
+      <div class="chat-body" id="chat-body">
+        <div class="chat-msg bot-msg">Hello! 👋 I’m your BedMatrix assistant. Ask about nearest hospital, emergency
+          beds, or blood bank availability.</div>
+      </div>
+      <div class="chat-input">
+        <input type="text" id="user-input" placeholder="Try: 'Nearest blood bank' or 'Is O+ available?'" />
+        <button onclick="sendMessage()">Send</button>
+      </div>
     </div>
-  </section>
+    <section class="faq-section" id="faq">
+      <h2 class="section-title">Frequently Asked Questions (FAQ)</h2>
+      <p class="faq-intro">Hover over each question to reveal the answer instantly.</p>
+      <div class="faq-container">
+        <div class="faq-item">
+          <div class="faq-question">🔹 What is BedMatrix?</div>
+          <div class="faq-answer">BedMatrix is a real-time hospital and blood bank tracking platform that helps users
+            find available beds and blood units across Delhi instantly.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">🔹 How does BedMatrix show live data?</div>
+          <div class="faq-answer">Hospitals and blood banks update their data through the secure BedMatrix Admin
+            Dashboard, ensuring accurate live availability.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">🔹 Can I find the nearest hospital or blood bank?</div>
+          <div class="faq-answer">Yes! The BedMatrix map and chatbot help you find the nearest hospital or blood bank
+            using your location.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">🔹 How can I check available blood groups?</div>
+          <div class="faq-answer">Visit the Blood Bank section or hover over the red map markers to see available blood
+            groups like A+, B+, O+, etc.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">🔹 Is my personal data safe?</div>
+          <div class="faq-answer">Yes, BedMatrix never stores or shares personal or location data. Your privacy is fully
+            protected.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">🔹 Does BedMatrix work on mobile devices?</div>
+          <div class="faq-answer">Absolutely! BedMatrix is fully responsive and optimized for phones, tablets, and
+            desktops.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">🔹 Who can access the Admin Dashboard?</div>
+          <div class="faq-answer">Only verified hospital and government staff can log into the Admin Dashboard to manage
+            bed and blood availability.</div>
+        </div>
+      </div>
+    </section>
 
-  <!-- Blood Banks Table -->
-  <section id="blood-bank-section">
-    <h2 style="text-align:center; margin-top:0.5rem;">🩸 Nearby Blood Banks</h2>
-    <p style="text-align:center; color:#4B5563; max-width:760px; margin:0.5rem auto 1rem;">
-      Find your nearest blood banks and check which blood groups are currently available. Click a row to center the map on that blood bank.
-    </p>
+    <footer>
+      <p>© <span id="year"></span> BedMatrix — demo UI. For production, wire to live APIs and secure admin access.</p>
+    </footer>
 
-    <table style="width:90%; max-width:940px; margin:0 auto 3rem; border-collapse:collapse; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
-      <thead>
-        <tr style="background:var(--primary-color); color:white;">
-          <th style="padding:0.9rem;">Blood Bank</th>
-          <th style="padding:0.9rem;">Location</th>
-          <th style="padding:0.9rem;">Available Blood Groups</th>
-        </tr>
-      </thead>
-      <tbody id="blood-bank-table"></tbody>
-    </table>
-  </section>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <!-- Chatbot -->
-  <button class="chatbot-toggle" onclick="toggleChatbot()" title="Open chat">💬</button>
-  <div class="chatbot-container" id="chatbot" aria-hidden="true">
-    <div class="chat-header">🩺 BedMatrix Assistant</div>
-    <div class="chat-body" id="chat-body">
-      <div class="chat-msg bot-msg">Hello! 👋 I’m your BedMatrix assistant. Ask about nearest hospital, emergency beds, or blood bank availability.</div>
-    </div>
-    <div class="chat-input">
-      <input type="text" id="user-input" placeholder="Try: 'Nearest blood bank' or 'Is O+ available?'" />
-      <button onclick="sendMessage()">Send</button>
-    </div>
-  </div>
-  <section class="faq-section" id="faq">
-    <h2 class="section-title">Frequently Asked Questions (FAQ)</h2>
-    <p class="faq-intro">Hover over each question to reveal the answer instantly.</p>
-    <div class="faq-container">
-      <div class="faq-item"><div class="faq-question">🔹 What is BedMatrix?</div><div class="faq-answer">BedMatrix is a real-time hospital and blood bank tracking platform that helps users find available beds and blood units across Delhi instantly.</div></div>
-      <div class="faq-item"><div class="faq-question">🔹 How does BedMatrix show live data?</div><div class="faq-answer">Hospitals and blood banks update their data through the secure BedMatrix Admin Dashboard, ensuring accurate live availability.</div></div>
-      <div class="faq-item"><div class="faq-question">🔹 Can I find the nearest hospital or blood bank?</div><div class="faq-answer">Yes! The BedMatrix map and chatbot help you find the nearest hospital or blood bank using your location.</div></div>
-      <div class="faq-item"><div class="faq-question">🔹 How can I check available blood groups?</div><div class="faq-answer">Visit the Blood Bank section or hover over the red map markers to see available blood groups like A+, B+, O+, etc.</div></div>
-      <div class="faq-item"><div class="faq-question">🔹 Is my personal data safe?</div><div class="faq-answer">Yes, BedMatrix never stores or shares personal or location data. Your privacy is fully protected.</div></div>
-      <div class="faq-item"><div class="faq-question">🔹 Does BedMatrix work on mobile devices?</div><div class="faq-answer">Absolutely! BedMatrix is fully responsive and optimized for phones, tablets, and desktops.</div></div>
-      <div class="faq-item"><div class="faq-question">🔹 Who can access the Admin Dashboard?</div><div class="faq-answer">Only verified hospital and government staff can log into the Admin Dashboard to manage bed and blood availability.</div></div>
-    </div>
-  </section>
+    <script>
+      // small init
+      document.getElementById('year').textContent = new Date().getFullYear();
 
-  <footer>
-    <p>© <span id="year"></span> BedMatrix — demo UI. For production, wire to live APIs and secure admin access.</p>
-  </footer>
+      // ===== Map initialization =====
+      const map = L.map('map', { zoomControl: true }).setView([28.6139, 77.2090], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+      // SAMPLE hospitals (now include wards for filtering)
+      const hospitals = [
 
-  <script>
-    // small init
-    document.getElementById('year').textContent = new Date().getFullYear();
+        {
+          id: 'H1',
+          name: "AIIMS Hospital",
+          lat: 28.5672,
+          lon: 77.2100,
+          contact: "+91-11-2658-8500",
 
-    // ===== Map initialization =====
-    const map = L.map('map', { zoomControl: true }).setView([28.6139, 77.2090], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+          wards: { General: 25, ICU: 2, Emergency: 8, Operation: 1 },
 
-    // SAMPLE hospitals (now include wards for filtering)
-   const hospitals = [
+          resources: { oxygen: 40, iv: 25, trolley: 8, ambulance: 4 },
 
-{
-  id:'H1',
-  name:"AIIMS Hospital",
-  lat:28.5672,
-  lon:77.2100,
-  contact:"+91-11-2658-8500",
+          rooms: []
+        },
 
-  wards:{General:25, ICU:2, Emergency:8, Operation:1},
+        {
+          id: 'H2',
+          name: "Fortis Hospital",
+          lat: 28.5562,
+          lon: 77.1000,
+          contact: "+91-11-4123-4567",
 
-  resources:{ oxygen:40, iv:25, trolley:8, ambulance:4 },
+          wards: { General: 18, ICU: 5, Emergency: 4, Operation: 2 },
 
-  rooms:[
-    {type:"General Ward", price:800, available:12},
-    {type:"Semi Private", price:1500, available:6},
-    {type:"Private", price:3000, available:4},
-    {type:"Deluxe", price:5000, available:2}
-  ]
-},
+          resources: { oxygen: 32, iv: 20, trolley: 6, ambulance: 3 },
 
-{
-  id:'H2',
-  name:"Fortis Hospital",
-  lat:28.5562,
-  lon:77.1000,
-  contact:"+91-11-4123-4567",
+          rooms: [
+            { type: "General Ward", price: 1000, available: 8 },
+            { type: "Semi Private", price: 1800, available: 5 },
+            { type: "Private", price: 3500, available: 3 },
+            { type: "Deluxe", price: 6000, available: 2 },
+            { type: "VIP", price: 9000, available: 1 }
+          ]
+        },
 
-  wards:{General:18, ICU:5, Emergency:4, Operation:2},
+        {
+          id: 'H3',
+          name: "Safdarjung Hospital",
+          lat: 28.5675,
+          lon: 77.2097,
+          contact: "+91-11-2610-3284",
 
-  resources:{ oxygen:32, iv:20, trolley:6, ambulance:3 },
+          wards: { General: 35, ICU: 1, Emergency: 10, Operation: 0 },
 
-  rooms:[
-    {type:"General Ward", price:1000, available:8},
-    {type:"Semi Private", price:1800, available:5},
-    {type:"Private", price:3500, available:3},
-    {type:"Deluxe", price:6000, available:2},
-    {type:"VIP", price:9000, available:1}
-  ]
-},
+          resources: { oxygen: 50, iv: 40, trolley: 12, ambulance: 5 },
 
-{
-  id:'H3',
-  name:"Safdarjung Hospital",
-  lat:28.5675,
-  lon:77.2097,
-  contact:"+91-11-2610-3284",
+          rooms: []
+        },
 
-  wards:{General:35, ICU:1, Emergency:10, Operation:0},
+        {
+          id: 'H4',
+          name: "Max Healthcare Saket",
+          lat: 28.5286,
+          lon: 77.2167,
+          contact: "+91-11-2651-5050",
 
-  resources:{ oxygen:50, iv:40, trolley:12, ambulance:5 },
+          wards: { General: 12, ICU: 6, Emergency: 3, Operation: 2 },
 
-  rooms:[
-    {type:"General Ward", price:500, available:20},
-    {type:"Semi Private", price:1200, available:10},
-    {type:"Private", price:2500, available:5}
-  ]
-},
+          resources: { oxygen: 22, iv: 15, trolley: 5, ambulance: 2 },
 
-{
-  id:'H4',
-  name:"Max Healthcare Saket",
-  lat:28.5286,
-  lon:77.2167,
-  contact:"+91-11-2651-5050",
+          rooms: [
+            { type: "Private", price: 4000, available: 6 },
+            { type: "Deluxe", price: 6500, available: 4 },
+            { type: "Super Deluxe", price: 9000, available: 2 },
+            { type: "VIP", price: 12000, available: 1 }
+          ]
+        },
 
-  wards:{General:12, ICU:6, Emergency:3, Operation:2},
+        {
+          id: 'H5',
+          name: "Apollo Hospital Delhi",
+          lat: 28.5420,
+          lon: 77.2835,
+          contact: "+91-11-2692-5858",
 
-  resources:{ oxygen:22, iv:15, trolley:5, ambulance:2 },
+          wards: { General: 20, ICU: 4, Emergency: 6, Operation: 3 },
 
-  rooms:[
-    {type:"Private", price:4000, available:6},
-    {type:"Deluxe", price:6500, available:4},
-    {type:"Super Deluxe", price:9000, available:2},
-    {type:"VIP", price:12000, available:1}
-  ]
-},
+          resources: { oxygen: 35, iv: 22, trolley: 7, ambulance: 4 },
 
-{
-  id:'H5',
-  name:"Apollo Hospital Delhi",
-  lat:28.5420,
-  lon:77.2835,
-  contact:"+91-11-2692-5858",
+          rooms: [
+            { type: "General Ward", price: 1200, available: 10 },
+            { type: "Private", price: 4200, available: 5 },
+            { type: "Deluxe", price: 7000, available: 3 },
+            { type: "VIP", price: 11000, available: 2 }
+          ]
+        },
 
-  wards:{General:20, ICU:4, Emergency:6, Operation:3},
+        {
+          id: 'H6',
+          name: "BLK-Max Super Specialty",
+          lat: 28.6434,
+          lon: 77.1890,
+          contact: "+91-11-3040-3040",
 
-  resources:{ oxygen:35, iv:22, trolley:7, ambulance:4 },
+          wards: { General: 14, ICU: 7, Emergency: 5, Operation: 2 },
 
-  rooms:[
-    {type:"General Ward", price:1200, available:10},
-    {type:"Private", price:4200, available:5},
-    {type:"Deluxe", price:7000, available:3},
-    {type:"VIP", price:11000, available:2}
-  ]
-},
+          resources: { oxygen: 28, iv: 18, trolley: 6, ambulance: 3 },
 
-{
-  id:'H6',
-  name:"BLK-Max Super Specialty",
-  lat:28.6434,
-  lon:77.1890,
-  contact:"+91-11-3040-3040",
+          rooms: [
+            { type: "Private", price: 3800, available: 6 },
+            { type: "Deluxe", price: 6200, available: 4 },
+            { type: "Super Deluxe", price: 9500, available: 2 },
+            { type: "VVIP", price: 15000, available: 1 }
+          ]
+        }
 
-  wards:{General:14, ICU:7, Emergency:5, Operation:2},
-
-  resources:{ oxygen:28, iv:18, trolley:6, ambulance:3 },
-
-  rooms:[
-    {type:"Private", price:3800, available:6},
-    {type:"Deluxe", price:6200, available:4},
-    {type:"Super Deluxe", price:9500, available:2},
-    {type:"VVIP", price:15000, available:1}
-  ]
-}
-
-];
+      ];
 
 
-    // create marker layer group & refs
-    const hospitalLayer = L.layerGroup().addTo(map);
-    const hospitalMarkers = {}; // id -> marker
+      // create marker layer group & refs
+      const hospitalLayer = L.layerGroup().addTo(map);
+      const hospitalMarkers = {}; // id -> marker
 
-   hospitals.forEach(h => {
+      hospitals.forEach(h => {
 
-  const popup = `
+        const popup = `
   <b>${h.name}</b><br>
   <hr></hr>
   Contact: ${h.contact}<br><br>
@@ -561,110 +1166,110 @@ nav {
 
 
 
-  // ✅ CREATE MARKER (you removed this accidentally)
-  const marker = L.marker([h.lat, h.lon]).bindPopup(popup);
+        // ✅ CREATE MARKER (you removed this accidentally)
+        const marker = L.marker([h.lat, h.lon]).bindPopup(popup);
 
-  hospitalMarkers[h.id] = marker;
-  hospitalLayer.addLayer(marker);
-});
+        hospitalMarkers[h.id] = marker;
+        hospitalLayer.addLayer(marker);
+      });
 
-  const redBloodIcon = L.icon({
-  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+      const redBloodIcon = L.icon({
+        iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-   
-
-    // Blood banks (unchanged)
-    const bloodBanks = [
-      { id: 'B1', name: "Delhi Red Cross Blood Bank", lat: 28.5740, lon: 77.2070, location: "Central Delhi", contact: "+91-11-2334-0001", groups: ["A+", "B+", "O+", "AB+", "O-", "A-"] },
-      { id: 'B2', name: "AIIMS Blood Bank", lat: 28.5678, lon: 77.2105, location: "Ansari Nagar", contact: "+91-11-2658-1234", groups: ["A+", "O+", "B-", "AB-"] },
-      { id: 'B3', name: "Fortis Blood Bank", lat: 28.5565, lon: 77.1012, location: "Okhla", contact: "+91-11-4123-9999", groups: ["A+", "O+", "B+", "O-"] },
-      { id: 'B4', name: "Apollo Blood Bank", lat: 28.5445, lon: 77.2693, location: "South Delhi", contact: "+91-11-2666-7777", groups: ["A+", "B+", "O+", "A-", "B-"] }
-    ];
-    const bloodBankMarkers = {};
-    bloodBanks.forEach(b => {
-      const bloodIcon = L.icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/1048/1048953.png",
-  iconSize: [28, 28],
-  iconAnchor: [14, 28],
-  popupAnchor: [0, -28]
-});
-
-const marker = L.marker([b.lat, b.lon], { icon: redBloodIcon }).addTo(map);
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
 
 
-      const popupHtml = `<div style="font-weight:600;">${b.name}</div>
+
+      // Blood banks (unchanged)
+      const bloodBanks = [
+        { id: 'B1', name: "Delhi Red Cross Blood Bank", lat: 28.5740, lon: 77.2070, location: "Central Delhi", contact: "+91-11-2334-0001", groups: ["A+", "B+", "O+", "AB+", "O-", "A-"] },
+        { id: 'B2', name: "AIIMS Blood Bank", lat: 28.5678, lon: 77.2105, location: "Ansari Nagar", contact: "+91-11-2658-1234", groups: ["A+", "O+", "B-", "AB-"] },
+        { id: 'B3', name: "Fortis Blood Bank", lat: 28.5565, lon: 77.1012, location: "Okhla", contact: "+91-11-4123-9999", groups: ["A+", "O+", "B+", "O-"] },
+        { id: 'B4', name: "Apollo Blood Bank", lat: 28.5445, lon: 77.2693, location: "South Delhi", contact: "+91-11-2666-7777", groups: ["A+", "B+", "O+", "A-", "B-"] }
+      ];
+      const bloodBankMarkers = {};
+      bloodBanks.forEach(b => {
+        const bloodIcon = L.icon({
+          iconUrl: "https://cdn-icons-png.flaticon.com/512/1048/1048953.png",
+          iconSize: [28, 28],
+          iconAnchor: [14, 28],
+          popupAnchor: [0, -28]
+        });
+
+        const marker = L.marker([b.lat, b.lon], { icon: redBloodIcon }).addTo(map);
+
+
+        const popupHtml = `<div style="font-weight:600;">${b.name}</div>
                          <div style="margin-top:6px;"><b>Location:</b> ${b.location}</div>
                          <div style="margin-top:6px;"><b>Contact:</b> ${b.contact}</div>
                          <div style="margin-top:6px;"><b>Available:</b> ${b.groups.join(", ")}</div>`;
-      marker.bindPopup(popupHtml);
-      bloodBankMarkers[b.id] = marker;
-    });
+        marker.bindPopup(popupHtml);
+        bloodBankMarkers[b.id] = marker;
+      });
 
-    // Populate blood bank table (click to open)
-    const tableBody = document.getElementById('blood-bank-table');
-    bloodBanks.forEach(b => {
-      const tr = document.createElement('tr');
-      tr.style.cursor = 'pointer';
-      tr.innerHTML = `<td style="padding:0.8rem; border-bottom:1px solid #E5E7EB; text-align:left">${b.name}</td>
+      // Populate blood bank table (click to open)
+      const tableBody = document.getElementById('blood-bank-table');
+      bloodBanks.forEach(b => {
+        const tr = document.createElement('tr');
+        tr.style.cursor = 'pointer';
+        tr.innerHTML = `<td style="padding:0.8rem; border-bottom:1px solid #E5E7EB; text-align:left">${b.name}</td>
                       <td style="padding:0.8rem; border-bottom:1px solid #E5E7EB">${b.location}</td>
                       <td style="padding:0.8rem; border-bottom:1px solid #E5E7EB">${b.groups.join(", ")}</td>`;
-      tr.addEventListener('click', () => {
-        map.setView([b.lat, b.lon], 14, { animate: true });
-        bloodBankMarkers[b.id].openPopup();
+        tr.addEventListener('click', () => {
+          map.setView([b.lat, b.lon], 14, { animate: true });
+          bloodBankMarkers[b.id].openPopup();
+        });
+        tableBody.appendChild(tr);
       });
-      tableBody.appendChild(tr);
-    });
 
-    // Legend
-    const legend = L.control({ position: "bottomright" });
-    legend.onAdd = function(map) {
-      const div = L.DomUtil.create("div", "legend");
-      div.innerHTML = `
+      // Legend
+      const legend = L.control({ position: "bottomright" });
+      legend.onAdd = function (map) {
+        const div = L.DomUtil.create("div", "legend");
+        div.innerHTML = `
         <div style="padding:8px; border-radius:8px; background:white; box-shadow:0 4px 10px rgba(0,0,0,0.06)">
           <div style="font-weight:600; margin-bottom:6px;">Map Legend</div>
           <div style="display:flex;align-items:center;gap:8px;"><svg width="12" height="12"><circle cx="6" cy="6" r="6" fill="#0074D9"/></svg><span>Hospitals</span></div>
           <div style="display:flex;align-items:center;gap:8px;margin-top:6px"><svg width="12" height="12"><circle cx="6" cy="6" r="6" fill="#EF4444"/></svg><span>Blood Banks</span></div>
         </div>`;
-      return div;
-    };
-    legend.addTo(map);
+        return div;
+      };
+      legend.addTo(map);
 
-    // ---------------- Search & Filter Logic ----------------
-    const input = document.getElementById('search-input');
-    const wardSelect = document.getElementById('ward-select');
-    const availabilitySelect = document.getElementById('availability-select');
-    const resetBtn = document.getElementById('reset-filters');
-    const listEl = document.getElementById('hospital-list');
-    const countEl = document.getElementById('result-count');
+      // ---------------- Search & Filter Logic ----------------
+      const input = document.getElementById('search-input');
+      const wardSelect = document.getElementById('ward-select');
+      const availabilitySelect = document.getElementById('availability-select');
+      const resetBtn = document.getElementById('reset-filters');
+      const listEl = document.getElementById('hospital-list');
+      const countEl = document.getElementById('result-count');
 
-    function totalBeds(h){ return Object.values(h.wards).reduce((a,b)=>a+b,0); }
-    function statusClass(h){
-      const t = totalBeds(h);
-      if(t > 10) return 'available';
-      if(t >= 3) return 'fewleft';
-      return 'full';
-    }
-
-    function renderList(arr){
-      listEl.innerHTML = '';
-      if(arr.length === 0){
-        listEl.innerHTML = '<div style="color:#64748B;padding:12px">No hospitals match your filters.</div>';
-        countEl.textContent = 'Showing 0';
-        return;
+      function totalBeds(h) { return Object.values(h.wards).reduce((a, b) => a + b, 0); }
+      function statusClass(h) {
+        const t = totalBeds(h);
+        if (t > 10) return 'available';
+        if (t >= 3) return 'fewleft';
+        return 'full';
       }
-      countEl.textContent = `Showing ${arr.length}`;
-      arr.forEach(h => {
-        const div = document.createElement('div');
-        div.className = 'h-card';
-        div.dataset.id = h.id;
-        div.innerHTML = `
+
+      function renderList(arr) {
+        listEl.innerHTML = '';
+        if (arr.length === 0) {
+          listEl.innerHTML = '<div style="color:#64748B;padding:12px">No hospitals match your filters.</div>';
+          countEl.textContent = 'Showing 0';
+          return;
+        }
+        countEl.textContent = `Showing ${arr.length}`;
+        arr.forEach(h => {
+          const div = document.createElement('div');
+          div.className = 'h-card';
+          div.dataset.id = h.id;
+          div.innerHTML = `
   <div class="h-left">
     <div class="h-name">${h.name}</div>
 
@@ -679,14 +1284,18 @@ const marker = L.marker([b.lat, b.lon], { icon: redBloodIcon }).addTo(map);
     </div>
 
     <table class="room-table">
-      ${h.rooms.map(r => `
-        <tr>
-          <td>${r.type}</td>
-          <td>₹${r.price}</td>
-          <td>${r.available}</td>
-        </tr>
-      `).join("")}
-    </table>
+     ${h.rooms.length ? `
+<table class="room-table">
+  ${h.rooms.map(r => `
+    <tr>
+      <td>${r.type}</td>
+      <td>₹${r.price}</td>
+      <td>${r.available}</td>
+    </tr>
+  `).join("")}
+</table>
+` : ""}
+
   </div>
 
   <div class="h-right">
@@ -696,296 +1305,297 @@ const marker = L.marker([b.lat, b.lon], { icon: redBloodIcon }).addTo(map);
   </div>
 `;
 
-        div.addEventListener('click', () => {
-          map.setView([h.lat, h.lon], 14, { animate:true });
-          hospitalMarkers[h.id].openPopup();
-        });
-        listEl.appendChild(div);
-      });
-    }
-
-    function applyFilters(){
-      const q = (input.value || '').trim().toLowerCase();
-      const ward = wardSelect.value;
-      const avail = availabilitySelect.value;
-
-      let out = hospitals.filter(h => h.name.toLowerCase().includes(q));
-
-      if(ward !== 'any'){
-        out = out.filter(h => (h.wards[ward] || 0) > 0);
-      }
-
-      if(avail !== 'any'){
-        out = out.filter(h => {
-          const t = totalBeds(h);
-          if(avail === 'available') return t > 10;
-          if(avail === 'few') return t >= 3 && t <= 10;
-          if(avail === 'full') return t <= 2;
-          return true;
+          div.addEventListener('click', () => {
+            map.setView([h.lat, h.lon], 14, { animate: true });
+            hospitalMarkers[h.id].openPopup();
+          });
+          listEl.appendChild(div);
         });
       }
 
-      // update markers: clear layer then add matched
-      hospitalLayer.clearLayers();
-      out.forEach(h => hospitalLayer.addLayer(hospitalMarkers[h.id]));
+      function applyFilters() {
+        const q = (input.value || '').trim().toLowerCase();
+        const ward = wardSelect.value;
+        const avail = availabilitySelect.value;
 
-      renderList(out);
-    }
+        let out = hospitals.filter(h => h.name.toLowerCase().includes(q));
 
-    // debounce helper
-    function debounce(fn, wait){
-      let t;
-      return function(...args){ clearTimeout(t); t = setTimeout(()=> fn.apply(this,args), wait); };
-    }
-
-    // initial render
-    applyFilters();
-
-    // events
-    input.addEventListener('input', debounce(applyFilters, 180));
-    wardSelect.addEventListener('change', applyFilters);
-    availabilitySelect.addEventListener('change', applyFilters);
-    resetBtn.addEventListener('click', () => {
-      input.value = '';
-      wardSelect.value = 'any';
-      availabilitySelect.value = 'any';
-      applyFilters();
-    });
-
-    // -------------- Chatbot (kept same) --------------
-    const chatbot = document.getElementById('chatbot');
-    const chatBody = document.getElementById('chat-body');
-    const userInput = document.getElementById('user-input');
-
-    function toggleChatbot(){ 
-      const isHidden = chatbot.style.display !== 'flex';
-      chatbot.style.display = isHidden ? 'flex' : 'none';
-      chatbot.setAttribute('aria-hidden', !isHidden);
-    }
-
-    function addMessage(msg, sender){
-      const div = document.createElement('div');
-      div.classList.add('chat-msg', sender==='bot' ? 'bot-msg' : 'user-msg');
-      div.textContent = msg;
-      chatBody.appendChild(div);
-      chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    function sendMessage(){
-      const raw = userInput.value.trim();
-      if(!raw) return;
-      addMessage(raw, 'user');
-      userInput.value = '';
-      setTimeout(()=> botReply(raw), 350);
-    }
-
-    // Haversine & helper functions (same as previous)
-    function haversine(lat1, lon1, lat2, lon2){
-      function toRad(x){ return x * Math.PI / 180; }
-      const R = 6371;
-      const dLat = toRad(lat2 - lat1);
-      const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-                Math.sin(dLon/2) * Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c;
-    }
-
-    function findNearestBloodBank(lat, lon){
-      let min = Infinity; let nearest = null;
-      bloodBanks.forEach(b => {
-        const d = haversine(lat, lon, b.lat, b.lon);
-        if(d < min){ min = d; nearest = { bank: b, distance: d }; }
-      });
-      return nearest;
-    }
-
-    function banksWithGroup(group){
-      const normalized = group.toUpperCase().replace(/\s+/g,'');
-      return bloodBanks.filter(b => b.groups.map(g=>g.toUpperCase()).includes(normalized));
-    }
-
-    function replyWithNearestBloodBank(){
-      if(!navigator.geolocation){
-        addMessage("Geolocation not available. Please type a city or landmark.", 'bot'); return;
-      }
-      addMessage("Requesting your location to find the nearest blood bank... (allow location)", 'bot');
-      navigator.geolocation.getCurrentPosition(pos => {
-        const lat = pos.coords.latitude; const lon = pos.coords.longitude;
-        const nearest = findNearestBloodBank(lat, lon);
-        if(!nearest){ addMessage("No blood banks found in our data.", 'bot'); return; }
-        const b = nearest.bank; const dKm = nearest.distance.toFixed(2);
-        addMessage(`Nearest blood bank: ${b.name} (${b.location}) — approx ${dKm} km away. Available: ${b.groups.join(", ")}`, 'bot');
-        map.setView([b.lat, b.lon], 14, { animate: true }); bloodBankMarkers[b.id].openPopup();
-      }, err => {
-        addMessage("Location access denied or failed. Please allow location access or ask by name.", 'bot');
-      }, { enableHighAccuracy:true, timeout:10000, maximumAge:60000 });
-    }
-    const HEALTHCARE_KEYWORDS = [
-  "hospital",
-  "bed",
-  "icu",
-  "emergency",
-  "blood",
-  "blood bank",
-  "donation",
-  "ambulance",
-  "health",
-  "medical",
-  "doctor",
-  "patient",
-  "ward"
-];
-
-const ALLOWED_SMALL_TALK = [
-  "hi",
-  "hello",
-  "hey",
-  "thanks",
-  "thank you",
-  "bye",
-  "goodbye",
-  "ok",
-  "okay"
-];
-
-
-    // bot reply (kept short)
-    async function botReply(rawInput) {
-  const input = (rawInput || "").toLowerCase();
-
-  // 🚧 DOMAIN GUARD: healthcare-only
-const isHealthcareQuery = HEALTHCARE_KEYWORDS.some(keyword =>
-  input.includes(keyword)
-);
-
-const isSmallTalk = ALLOWED_SMALL_TALK.some(word =>
-  input === word || input.startsWith(word)
-);
-
-// 🚧 Block ONLY if it's neither healthcare nor small talk
-if (!isHealthcareQuery && !isSmallTalk) {
-  // Let AI gently redirect instead of frontend
-  // → do NOT return here
-}
-
-
-
-
-  /* ===============================
-     RULE-BASED (FAST & PRECISE)
-     =============================== */
-
-  // Nearest blood bank
-  if (
-    input.includes("nearest blood") ||
-    input.includes("nearest blood bank") ||
-    input.includes("closest blood")
-  ) {
-    replyWithNearestBloodBank();
-    return;
-  }
-
-  // Blood group availability (A+, O-, etc.)
-  const groupMatch = rawInput.match(/(a\+|a-|b\+|b-|o\+|o-|ab\+|ab-)/i);
-  if (groupMatch) {
-    const group = groupMatch[0].toUpperCase();
-    const banks = banksWithGroup(group);
-
-    if (banks.length === 0) {
-      addMessage(`No blood banks currently list ${group}.`, "bot");
-    } else {
-      addMessage(
-        `${group} is available at: ${banks
-          .map((b) => `${b.name} (${b.location})`)
-          .join("; ")}`,
-        "bot"
-      );
-      map.setView([banks[0].lat, banks[0].lon], 14);
-      bloodBankMarkers[banks[0].id].openPopup();
-    }
-    return;
-  }
-
-  // Nearest hospital
-  if (input.includes("nearest hospital") || input.includes("nearby hospital")) {
-    if (!navigator.geolocation) {
-      addMessage("Geolocation unavailable. Please search manually.", "bot");
-      return;
-    }
-
-    addMessage("Locating nearest hospital... (allow location)", "bot");
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-
-        let min = Infinity;
-        let nearest = null;
-
-        hospitals.forEach((h) => {
-          const d = haversine(lat, lon, h.lat, h.lon);
-          if (d < min) {
-            min = d;
-            nearest = { h, d };
-          }
-        });
-
-        if (nearest) {
-          addMessage(
-            `Nearest hospital: ${nearest.h.name} (~${nearest.d.toFixed(
-              2
-            )} km). Contact: ${nearest.h.contact}`,
-            "bot"
-          );
-          map.setView([nearest.h.lat, nearest.h.lon], 14);
-          hospitalMarkers[nearest.h.id].openPopup();
-        } else {
-          addMessage("No hospitals found.", "bot");
+        if (ward !== 'any') {
+          out = out.filter(h => (h.wards[ward] || 0) > 0);
         }
-      },
-      () => addMessage("Location access denied.", "bot"),
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-    return;
-  }
 
-  /* ===============================
-     AI FALLBACK (SMART & FLEXIBLE)
-     =============================== */
+        if (avail !== 'any') {
+          out = out.filter(h => {
+            const t = totalBeds(h);
+            if (avail === 'available') return t > 10;
+            if (avail === 'few') return t >= 3 && t <= 10;
+            if (avail === 'full') return t <= 2;
+            return true;
+          });
+        }
 
-  addMessage("Typing...", "bot");
+        // update markers: clear layer then add matched
+        hospitalLayer.clearLayers();
+        out.forEach(h => hospitalLayer.addLayer(hospitalMarkers[h.id]));
 
-  try {
-    const res = await fetch("https://bedmatrix-backend.onrender.com/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: rawInput }),
-    });
+        renderList(out);
+      }
 
-    const data = await res.json();
+      // debounce helper
+      function debounce(fn, wait) {
+        let t;
+        return function (...args) { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), wait); };
+      }
 
-    // remove "Typing..."
-    chatBody.removeChild(chatBody.lastChild);
+      // initial render
+      applyFilters();
 
-    addMessage(data.reply, "bot");
-  } catch (err) {
-    chatBody.removeChild(chatBody.lastChild);
-    addMessage("⚠️ AI backend not reachable", "bot");
-  }
-}
+      // events
+      input.addEventListener('input', debounce(applyFilters, 180));
+      wardSelect.addEventListener('change', applyFilters);
+      availabilitySelect.addEventListener('change', applyFilters);
+      resetBtn.addEventListener('click', () => {
+        input.value = '';
+        wardSelect.value = 'any';
+        availabilitySelect.value = 'any';
+        applyFilters();
+      });
+
+      // -------------- Chatbot (kept same) --------------
+      const chatbot = document.getElementById('chatbot');
+      const chatBody = document.getElementById('chat-body');
+      const userInput = document.getElementById('user-input');
+
+      function toggleChatbot() {
+        const isHidden = chatbot.style.display !== 'flex';
+        chatbot.style.display = isHidden ? 'flex' : 'none';
+        chatbot.setAttribute('aria-hidden', !isHidden);
+      }
+
+      function addMessage(msg, sender) {
+        const div = document.createElement('div');
+        div.classList.add('chat-msg', sender === 'bot' ? 'bot-msg' : 'user-msg');
+        div.textContent = msg;
+        chatBody.appendChild(div);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+
+      function sendMessage() {
+        const raw = userInput.value.trim();
+        if (!raw) return;
+        addMessage(raw, 'user');
+        userInput.value = '';
+        setTimeout(() => botReply(raw), 350);
+      }
+
+      // Haversine & helper functions (same as previous)
+      function haversine(lat1, lon1, lat2, lon2) {
+        function toRad(x) { return x * Math.PI / 180; }
+        const R = 6371;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+      }
+
+      function findNearestBloodBank(lat, lon) {
+        let min = Infinity; let nearest = null;
+        bloodBanks.forEach(b => {
+          const d = haversine(lat, lon, b.lat, b.lon);
+          if (d < min) { min = d; nearest = { bank: b, distance: d }; }
+        });
+        return nearest;
+      }
+
+      function banksWithGroup(group) {
+        const normalized = group.toUpperCase().replace(/\s+/g, '');
+        return bloodBanks.filter(b => b.groups.map(g => g.toUpperCase()).includes(normalized));
+      }
+
+      function replyWithNearestBloodBank() {
+        if (!navigator.geolocation) {
+          addMessage("Geolocation not available. Please type a city or landmark.", 'bot'); return;
+        }
+        addMessage("Requesting your location to find the nearest blood bank... (allow location)", 'bot');
+        navigator.geolocation.getCurrentPosition(pos => {
+          const lat = pos.coords.latitude; const lon = pos.coords.longitude;
+          const nearest = findNearestBloodBank(lat, lon);
+          if (!nearest) { addMessage("No blood banks found in our data.", 'bot'); return; }
+          const b = nearest.bank; const dKm = nearest.distance.toFixed(2);
+          addMessage(`Nearest blood bank: ${b.name} (${b.location}) — approx ${dKm} km away. Available: ${b.groups.join(", ")}`, 'bot');
+          map.setView([b.lat, b.lon], 14, { animate: true }); bloodBankMarkers[b.id].openPopup();
+        }, err => {
+          addMessage("Location access denied or failed. Please allow location access or ask by name.", 'bot');
+        }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+      }
+      const HEALTHCARE_KEYWORDS = [
+        "hospital",
+        "bed",
+        "icu",
+        "emergency",
+        "blood",
+        "blood bank",
+        "donation",
+        "ambulance",
+        "health",
+        "medical",
+        "doctor",
+        "patient",
+        "ward"
+      ];
+
+      const ALLOWED_SMALL_TALK = [
+        "hi",
+        "hello",
+        "hey",
+        "thanks",
+        "thank you",
+        "bye",
+        "goodbye",
+        "ok",
+        "okay"
+      ];
 
 
-    
-    document.getElementById('user-input').addEventListener('keydown', function(e){ if(e.key==='Enter') sendMessage(); });
+      // bot reply (kept short)
+      async function botReply(rawInput) {
+        const input = (rawInput || "").toLowerCase();
 
-    
-    window.sendMessage = sendMessage;
-    window.toggleChatbot = toggleChatbot;
+        // 🚧 DOMAIN GUARD: healthcare-only
+        const isHealthcareQuery = HEALTHCARE_KEYWORDS.some(keyword =>
+          input.includes(keyword)
+        );
 
-  </script>
+        const isSmallTalk = ALLOWED_SMALL_TALK.some(word =>
+          input === word || input.startsWith(word)
+        );
+
+        // 🚧 Block ONLY if it's neither healthcare nor small talk
+        if (!isHealthcareQuery && !isSmallTalk) {
+          // Let AI gently redirect instead of frontend
+          // → do NOT return here
+        }
+
+
+
+
+        /* ===============================
+           RULE-BASED (FAST & PRECISE)
+           =============================== */
+
+        // Nearest blood bank
+        if (
+          input.includes("nearest blood") ||
+          input.includes("nearest blood bank") ||
+          input.includes("closest blood")
+        ) {
+          replyWithNearestBloodBank();
+          return;
+        }
+
+        // Blood group availability (A+, O-, etc.)
+        const groupMatch = rawInput.match(/(a\+|a-|b\+|b-|o\+|o-|ab\+|ab-)/i);
+        if (groupMatch) {
+          const group = groupMatch[0].toUpperCase();
+          const banks = banksWithGroup(group);
+
+          if (banks.length === 0) {
+            addMessage(`No blood banks currently list ${group}.`, "bot");
+          } else {
+            addMessage(
+              `${group} is available at: ${banks
+                .map((b) => `${b.name} (${b.location})`)
+                .join("; ")}`,
+              "bot"
+            );
+            map.setView([banks[0].lat, banks[0].lon], 14);
+            bloodBankMarkers[banks[0].id].openPopup();
+          }
+          return;
+        }
+
+        // Nearest hospital
+        if (input.includes("nearest hospital") || input.includes("nearby hospital")) {
+          if (!navigator.geolocation) {
+            addMessage("Geolocation unavailable. Please search manually.", "bot");
+            return;
+          }
+
+          addMessage("Locating nearest hospital... (allow location)", "bot");
+
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              const lat = pos.coords.latitude;
+              const lon = pos.coords.longitude;
+
+              let min = Infinity;
+              let nearest = null;
+
+              hospitals.forEach((h) => {
+                const d = haversine(lat, lon, h.lat, h.lon);
+                if (d < min) {
+                  min = d;
+                  nearest = { h, d };
+                }
+              });
+
+              if (nearest) {
+                addMessage(
+                  `Nearest hospital: ${nearest.h.name} (~${nearest.d.toFixed(
+                    2
+                  )} km). Contact: ${nearest.h.contact}`,
+                  "bot"
+                );
+                map.setView([nearest.h.lat, nearest.h.lon], 14);
+                hospitalMarkers[nearest.h.id].openPopup();
+              } else {
+                addMessage("No hospitals found.", "bot");
+              }
+            },
+            () => addMessage("Location access denied.", "bot"),
+            { enableHighAccuracy: true, timeout: 10000 }
+          );
+          return;
+        }
+
+        /* ===============================
+           AI FALLBACK (SMART & FLEXIBLE)
+           =============================== */
+
+        addMessage("Typing...", "bot");
+
+        try {
+          const res = await fetch("https://bedmatrix-backend.onrender.com/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: rawInput }),
+          });
+
+          const data = await res.json();
+
+          // remove "Typing..."
+          chatBody.removeChild(chatBody.lastChild);
+
+          addMessage(data.reply, "bot");
+        } catch (err) {
+          chatBody.removeChild(chatBody.lastChild);
+          addMessage("⚠️ AI backend not reachable", "bot");
+        }
+      }
+
+
+
+      document.getElementById('user-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') sendMessage(); });
+
+
+      window.sendMessage = sendMessage;
+      window.toggleChatbot = toggleChatbot;
+
+    </script>
 
 </body>
+
 </html>
