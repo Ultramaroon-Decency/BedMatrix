@@ -639,6 +639,49 @@
       .hero h2 {
         font-size: 2.5rem;
       }
+
+      /* Tablet Dashboard Table Styles */
+      .dashboard table {
+        max-width: 100%;
+      }
+
+      .dashboard th,
+      .dashboard td {
+        padding: 0.8rem 1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+
+      /* Dashboard table wrapper for horizontal scroll */
+      .dashboard {
+        padding: 3rem 2%;
+      }
+
+      .dashboard table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .dashboard th,
+      .dashboard td {
+        padding: 0.75rem 1rem;
+        min-width: 80px;
+      }
+
+      .dashboard th:first-child,
+      .dashboard td:first-child {
+        min-width: 100px;
+        position: sticky;
+        left: 0;
+        background: var(--bg-surface);
+        z-index: 1;
+      }
+
+      .dashboard th:first-child {
+        background: var(--bg-body);
+      }
     }
 
     @media (max-width: 600px) {
@@ -655,6 +698,38 @@
         gap: 1rem;
         flex-wrap: wrap;
         justify-content: center;
+      }
+
+      /* Mobile Dashboard Table Fix */
+      .dashboard {
+        padding: 2rem 1rem;
+      }
+
+      .dashboard table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+      }
+
+      .dashboard th,
+      .dashboard td {
+        padding: 0.75rem 0.8rem;
+        font-size: 0.85rem;
+      }
+
+      .dashboard th {
+        font-size: 0.7rem;
+      }
+
+      .status {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+      }
+
+      h2.section-title {
+        font-size: 1.6rem;
+        margin-bottom: 1.5rem;
       }
     }
 
