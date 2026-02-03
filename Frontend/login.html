@@ -7,7 +7,7 @@
 
     <link rel="stylesheet" href="css/login.css">
 
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>        <!--https://boxicons.com/ -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'> <!--https://boxicons.com/ -->
 
     <title>Bedmatrix Login</title>
 </head>
@@ -30,6 +30,11 @@
                 <input type="password" placeholder="Enter Password">
                 <button>Sign Up</button>
             </form>
+            <div class="mobile-toggle">
+                <span>Already have an account?</span>
+                <a href="#"
+                    onclick="document.getElementById('container').classList.remove('active'); return false;">Sign In</a>
+            </div>
         </div>
 
 
@@ -48,6 +53,11 @@
                 <a href="#">Forget Password?</a>
                 <button>Sign In</button>
             </form>
+            <div class="mobile-toggle">
+                <span>Don't have an account?</span>
+                <a href="#" onclick="document.getElementById('container').classList.add('active'); return false;">Sign
+                    Up</a>
+            </div>
         </div>
 
 
