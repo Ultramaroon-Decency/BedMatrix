@@ -8,7 +8,7 @@
 }
 
 body {
-    background-color: rgba(11, 10, 10, 0.992);
+    background-color: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
