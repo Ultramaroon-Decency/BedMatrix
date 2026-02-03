@@ -211,3 +211,170 @@ body{
     transform: translateY(-6px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
 }
+
+/* ============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================ */
+
+@media (max-width: 600px) {
+    body {
+        padding: 1rem;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .container {
+        width: 100%;
+        min-height: auto;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .form-container {
+        position: relative;
+        width: 100% !important;
+        height: auto;
+        transform: none !important;
+    }
+
+    .sign-in {
+        width: 100%;
+        left: 0;
+        order: 1;
+    }
+
+    .sign-up {
+        width: 100%;
+        left: 0;
+        opacity: 1;
+        display: none;
+        order: 1;
+    }
+
+    .container.active .sign-in {
+        display: none;
+        transform: none;
+    }
+
+    .container.active .sign-up {
+        display: block;
+        transform: none;
+        animation: none;
+    }
+
+    .container form {
+        padding: 2rem 1.5rem;
+    }
+
+    .container form h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .social-icons {
+        margin: 15px 0;
+    }
+
+    .social-icons a {
+        width: 36px;
+        height: 36px;
+    }
+
+    .container input {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+
+    .container button {
+        padding: 12px 35px;
+        font-size: 11px;
+    }
+
+    /* Toggle container mobile styles */
+    .toggle-container {
+        position: relative;
+        left: 0;
+        width: 100%;
+        height: auto;
+        border-radius: 0 0 20px 20px;
+        transform: none !important;
+        order: 2;
+    }
+
+    .container.active .toggle-container {
+        transform: none;
+        order: 0;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .toggle {
+        width: 100%;
+        left: 0;
+        transform: none !important;
+        border-radius: 0 0 20px 20px;
+    }
+
+    .container.active .toggle {
+        transform: none;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .toggle-panel {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 2rem 1.5rem;
+        transform: none !important;
+    }
+
+    .toggle-left {
+        display: none;
+        transform: none;
+    }
+
+    .toggle-right {
+        display: flex;
+        transform: none;
+    }
+
+    .container.active .toggle-left {
+        display: flex;
+        transform: none;
+    }
+
+    .container.active .toggle-right {
+        display: none;
+    }
+
+    .toggle-panel h1 {
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .toggle-panel p {
+        font-size: 13px;
+        margin: 10px 0 15px;
+    }
+
+    .toggle-panel button.hidden {
+        padding: 10px 30px;
+    }
+}
+
+/* Tablet styles */
+@media (max-width: 768px) and (min-width: 601px) {
+    .container {
+        width: 95%;
+        max-width: 600px;
+    }
+
+    .container form {
+        padding: 0 25px;
+    }
+
+    .toggle-panel {
+        padding: 0 20px;
+    }
+}
