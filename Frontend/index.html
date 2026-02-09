@@ -443,63 +443,33 @@
       padding: 2rem;
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-md);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      border: 2px solid transparent;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      border: 2px solid var(--border-light);
       text-align: left;
       position: relative;
-      overflow: hidden;
       min-width: 280px;
       max-width: 280px;
       min-height: 200px;
       flex-shrink: 0;
-      background-clip: padding-box;
     }
 
-    /* Gradient border on hover */
+    /* Invisible extended hover zone to prevent jiggle at edges */
     .feature-card::before {
       content: '';
       position: absolute;
-      inset: 0;
-      border-radius: var(--radius-lg);
-      padding: 2px;
-      background: linear-gradient(135deg, var(--primary), #06B6D4, var(--primary));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-
-    /* Shimmer effect */
-    .feature-card::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg,
-          transparent,
-          rgba(255, 255, 255, 0.3),
-          transparent);
-      transition: left 0.6s ease;
+      top: -15px;
+      left: -15px;
+      right: -15px;
+      bottom: -15px;
+      z-index: -1;
     }
 
     .feature-card:hover {
-      transform: translateY(-12px) scale(1.03);
+      transform: translateY(-10px);
       box-shadow:
         0 20px 40px -10px rgba(99, 102, 241, 0.3),
         0 10px 20px -5px rgba(6, 182, 212, 0.2);
-      background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
-    }
-
-    .feature-card:hover::before {
-      opacity: 1;
-    }
-
-    .feature-card:hover::after {
-      left: 100%;
+      border-color: var(--primary);
     }
 
     /* Icon animation on hover */
