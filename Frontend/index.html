@@ -12,6 +12,9 @@
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
   <style>
     /* ------------------------------------------------------------
        🎨 BEDMATRIX MODERN PREMIUM UI - DESIGN SYSTEM
@@ -206,6 +209,100 @@
         radial-gradient(circle at bottom left, #CCFBF1 0%, transparent 40%),
         var(--bg-body);
       overflow: hidden;
+      position: relative;
+      min-height: calc(100vh - 70px);
+      /* Full viewport minus navbar */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Three.js 3D Canvas */
+    #threejs-hero-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero h2,
+    .hero p,
+    .hero button,
+    .scroll-indicator {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Scroll Indicator Arrow */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      animation: bounce 2s infinite;
+      color: var(--primary);
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+
+    .scroll-indicator:hover {
+      opacity: 1;
+    }
+
+    .scroll-indicator span {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .scroll-indicator svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      20%,
+      50%,
+      80%,
+      100% {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      40% {
+        transform: translateX(-50%) translateY(-10px);
+      }
+
+      60% {
+        transform: translateX(-50%) translateY(-5px);
+      }
+    }
+
+    /* Section title animation */
+    .section-title.scroll-revealed {
+      animation: fadeSlideUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .hero h2 {
@@ -244,12 +341,101 @@
     }
 
     /* 6. FEATURES (Cards) */
+    .features-section {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Three.js 3D Canvas for Features */
+    #threejs-features-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .features-section .section-title {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Carousel wrapper */
+    .features-marquee-wrapper {
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+      padding: 1rem 0;
+    }
+
     .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      display: flex;
       gap: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
+      width: max-content;
+      animation: marquee 25s linear infinite;
+      transition: none;
+    }
+
+    /* Pause and switch to step mode on hover */
+    .features-grid.step-mode {
+      animation: none;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes marquee {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    /* Feature Navigation Controls - Side positioned */
+    .feature-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+    }
+
+    .feature-nav-btn#feature-prev {
+      left: 1rem;
+    }
+
+    .feature-nav-btn#feature-next {
+      right: 1rem;
+    }
+
+    .feature-nav-btn:hover {
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Pause animation when hovering on buttons */
+    .feature-nav-btn:hover~.features-marquee-wrapper .features-grid,
+    .features-section:has(.feature-nav-btn:hover) .features-grid {
+      animation-play-state: paused;
+    }
+
+    .feature-nav-btn svg {
+      width: 20px;
+      height: 20px;
     }
 
     .feature-card {
@@ -257,29 +443,74 @@
       padding: 2rem;
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-md);
-      transition: all 0.3s ease;
-      border: 1px solid var(--border-light);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px solid transparent;
       text-align: left;
-      /* Modern Left Align */
       position: relative;
       overflow: hidden;
+      min-width: 280px;
+      max-width: 280px;
+      min-height: 200px;
+      flex-shrink: 0;
+      background-clip: padding-box;
     }
 
+    /* Gradient border on hover */
     .feature-card::before {
       content: '';
       position: absolute;
+      inset: 0;
+      border-radius: var(--radius-lg);
+      padding: 2px;
+      background: linear-gradient(135deg, var(--primary), #06B6D4, var(--primary));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    /* Shimmer effect */
+    .feature-card::after {
+      content: '';
+      position: absolute;
       top: 0;
-      left: 0;
-      width: 0;
-      height: 4px;
-      background: var(--primary);
-      transition: width 0.3s;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent);
+      transition: left 0.6s ease;
     }
 
     .feature-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-      border-color: #C7D2FE;
+      transform: translateY(-12px) scale(1.03);
+      box-shadow:
+        0 20px 40px -10px rgba(99, 102, 241, 0.3),
+        0 10px 20px -5px rgba(6, 182, 212, 0.2);
+      background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-card:hover::after {
+      left: 100%;
+    }
+
+    /* Icon animation on hover */
+    .feature-card:hover .feature-icon {
+      transform: scale(1.15) rotate(5deg);
+      filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.3));
+    }
+
+    /* Title glow on hover */
+    .feature-card:hover .feature-title {
+      color: var(--primary);
     }
 
     .feature-icon {
@@ -290,12 +521,14 @@
       background: #EEF2FF;
       border-radius: 16px;
       object-fit: contain;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), filter 0.4s ease;
     }
 
     .feature-title {
       font-size: 1.3rem;
       margin-bottom: 0.5rem;
       color: var(--text-main);
+      transition: color 0.3s ease;
     }
 
     .feature-desc {
@@ -315,6 +548,16 @@
       border-radius: var(--radius-md);
       overflow: hidden;
       background: var(--bg-surface);
+      /* Scroll reveal - initial hidden state */
+      opacity: 0;
+      transform: translateY(50px) scale(0.95);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Scroll reveal - visible state */
+    .dashboard table.scroll-revealed {
+      opacity: 1;
+      transform: translateY(0) scale(1);
     }
 
     th,
@@ -972,43 +1215,93 @@
 
   <!-- Hero -->
   <section class="hero" id="home">
+    <canvas id="threejs-hero-canvas"></canvas>
     <h2>Real-Time Hospital Bed Availability</h2>
     <p>Find available beds in General, ICU, Emergency, and Operation wards instantly. Your healthcare decisions
       simplified.</p>
+    <!-- Scroll Indicator -->
+    <a href="#features" class="scroll-indicator">
+      <span>Scroll to explore</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </a>
   </section>
 
   <!-- Features -->
   <section class="features-section" id="features">
+    <canvas id="threejs-features-canvas"></canvas>
     <h2 class="section-title">Key Features</h2>
-    <div class="features-grid">
-      <div class="feature-card">
-        <img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png" class="feature-icon" alt="real-time" />
-        <h3 class="feature-title">Real-Time Availability</h3>
-        <p class="feature-desc">Instant bed updates across all wards.</p>
-      </div>
-      <div class="feature-card">
-        <img src="https://cdn-icons-png.flaticon.com/512/483/483356.png" class="feature-icon" alt="search" />
-        <h3 class="feature-title">Search & Filter</h3>
-        <p class="feature-desc">Find hospitals by name, ward, or availability.</p>
-      </div>
-      <div class="feature-card">
-        <img src="https://cdn-icons-png.flaticon.com/512/942/942799.png" class="feature-icon" alt="admin" />
-        <h3 class="feature-title">Admin Dashboard</h3>
-        <p class="feature-desc">Securely update bed records.</p>
-      </div>
-      <div class="feature-card">
-        <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" class="feature-icon" alt="alerts" />
-        <h3 class="feature-title">Smart Alerts</h3>
-        <p class="feature-desc">Color-coded bed availability status.</p>
-      </div>
-
-      <!-- NEW: Blood Bank Locator feature card -->
-      <div class="feature-card">
-        <img src="https://cdn-icons-png.flaticon.com/512/1048/1048953.png" class="feature-icon" alt="blood-bank" />
-        <h3 class="feature-title">Blood Bank Locator</h3>
-        <p class="feature-desc">Find nearest blood banks and check available blood groups instantly.</p>
+    <div class="features-marquee-wrapper">
+      <div class="features-grid">
+        <!-- Original cards -->
+        <div class="feature-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png" class="feature-icon" alt="real-time" />
+          <h3 class="feature-title">Real-Time Availability</h3>
+          <p class="feature-desc">Instant bed updates across all wards.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/483/483356.png" class="feature-icon" alt="search" />
+          <h3 class="feature-title">Search & Filter</h3>
+          <p class="feature-desc">Find hospitals by name, ward, or availability.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/942/942799.png" class="feature-icon" alt="admin" />
+          <h3 class="feature-title">Admin Dashboard</h3>
+          <p class="feature-desc">Securely update bed records.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" class="feature-icon" alt="alerts" />
+          <h3 class="feature-title">Smart Alerts</h3>
+          <p class="feature-desc">Color-coded bed availability status.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/1048/1048953.png" class="feature-icon" alt="blood-bank" />
+          <h3 class="feature-title">Blood Bank Locator</h3>
+          <p class="feature-desc">Find nearest blood banks and check available blood groups instantly.</p>
+        </div>
+        <!-- Duplicate cards for seamless marquee loop -->
+        <div class="feature-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png" class="feature-icon" alt="real-time" />
+          <h3 class="feature-title">Real-Time Availability</h3>
+          <p class="feature-desc">Instant bed updates across all wards.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/483/483356.png" class="feature-icon" alt="search" />
+          <h3 class="feature-title">Search & Filter</h3>
+          <p class="feature-desc">Find hospitals by name, ward, or availability.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/942/942799.png" class="feature-icon" alt="admin" />
+          <h3 class="feature-title">Admin Dashboard</h3>
+          <p class="feature-desc">Securely update bed records.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" class="feature-icon" alt="alerts" />
+          <h3 class="feature-title">Smart Alerts</h3>
+          <p class="feature-desc">Color-coded bed availability status.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/1048/1048953.png" class="feature-icon" alt="blood-bank" />
+          <h3 class="feature-title">Blood Bank Locator</h3>
+          <p class="feature-desc">Find nearest blood banks and check available blood groups instantly.</p>
+        </div>
       </div>
     </div>
+    <!-- Feature Navigation Controls -->
+    <button class="feature-nav-btn" id="feature-prev" title="Scroll Left">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+        stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <button class="feature-nav-btn" id="feature-next" title="Scroll Right">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+        stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
   </section>
 
   <!-- Dashboard -->
@@ -1027,7 +1320,7 @@
       </thead>
       <tbody>
         <tr>
-          <td>AIIMS</td>
+          <td>AIIMS Delhi</td>
           <td>25/50</td>
           <td>8/15</td>
           <td>2/10</td>
@@ -1035,11 +1328,35 @@
           <td><span class="status fewleft">Few Left</span></td>
         </tr>
         <tr>
-          <td>Fortis</td>
+          <td>Fortis Hospital</td>
           <td>10/40</td>
           <td>2/10</td>
           <td>1/5</td>
           <td>0/5</td>
+          <td><span class="status available">Available</span></td>
+        </tr>
+        <tr>
+          <td>Max Super Speciality</td>
+          <td>8/45</td>
+          <td>1/10</td>
+          <td>0/6</td>
+          <td>1/3</td>
+          <td><span class="status fewleft">Few Left</span></td>
+        </tr>
+        <tr>
+          <td>Safdarjung Hospital</td>
+          <td>0/55</td>
+          <td>0/18</td>
+          <td>0/12</td>
+          <td>0/6</td>
+          <td><span class="status full">Full</span></td>
+        </tr>
+        <tr>
+          <td>Medanta Hospital</td>
+          <td>22/50</td>
+          <td>6/14</td>
+          <td>4/10</td>
+          <td>2/5</td>
           <td><span class="status available">Available</span></td>
         </tr>
       </tbody>
@@ -1804,6 +2121,785 @@
       window.sendMessage = sendMessage;
       window.toggleChatbot = toggleChatbot;
 
+    </script>
+
+    <!-- Three.js Hero Animation - Enhanced Interactive Version -->
+    <script>
+      (function () {
+        // Get the canvas and hero section
+        const canvas = document.getElementById('threejs-hero-canvas');
+        const heroSection = document.querySelector('.hero');
+
+        if (!canvas || !heroSection) return;
+
+        // Enable pointer events for interactivity
+        canvas.style.pointerEvents = 'auto';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+
+        // Camera setup
+        const camera = new THREE.PerspectiveCamera(75, heroSection.offsetWidth / heroSection.offsetHeight, 0.1, 1000);
+        camera.position.z = 30;
+
+        // Renderer setup
+        const renderer = new THREE.WebGLRenderer({
+          canvas: canvas,
+          antialias: true,
+          alpha: true
+        });
+        renderer.setSize(heroSection.offsetWidth, heroSection.offsetHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x000000, 0);
+
+        // Raycaster for mouse interaction
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        // Brand colors
+        const colors = {
+          primary: 0x4F46E5,
+          secondary: 0x06B6D4,
+          accent1: 0x10B981,
+          accent2: 0x8B5CF6,
+          highlight: 0xFFFFFF
+        };
+
+        // Arrays to hold objects
+        const floatingShapes = [];
+        const clickParticles = [];
+        let hoveredShape = null;
+
+        // Create floating geometric shapes
+        function createFloatingShapes() {
+          const geometries = [
+            new THREE.IcosahedronGeometry(1.8, 0),
+            new THREE.OctahedronGeometry(1.5, 0),
+            new THREE.TorusGeometry(1.2, 0.5, 8, 16),
+            new THREE.SphereGeometry(1.2, 16, 16),
+            new THREE.TetrahedronGeometry(1.5, 0),
+            new THREE.DodecahedronGeometry(1.3, 0),
+            new THREE.TorusKnotGeometry(0.8, 0.3, 50, 8)
+          ];
+
+          const colorArray = [colors.primary, colors.secondary, colors.accent1, colors.accent2];
+
+          for (let i = 0; i < 15; i++) {
+            const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+            const material = new THREE.MeshBasicMaterial({
+              color: colorArray[Math.floor(Math.random() * colorArray.length)],
+              wireframe: true,
+              transparent: true,
+              opacity: 0.4 + Math.random() * 0.3
+            });
+
+            const mesh = new THREE.Mesh(geometry, material);
+
+            // Random position
+            mesh.position.x = (Math.random() - 0.5) * 60;
+            mesh.position.y = (Math.random() - 0.5) * 35;
+            mesh.position.z = (Math.random() - 0.5) * 25 - 5;
+
+            // Random rotation
+            mesh.rotation.x = Math.random() * Math.PI;
+            mesh.rotation.y = Math.random() * Math.PI;
+
+            // Store animation properties
+            mesh.userData = {
+              rotationSpeed: {
+                x: (Math.random() - 0.5) * 0.015,
+                y: (Math.random() - 0.5) * 0.015,
+                z: (Math.random() - 0.5) * 0.008
+              },
+              floatSpeed: 0.4 + Math.random() * 0.6,
+              floatOffset: Math.random() * Math.PI * 2,
+              originalY: mesh.position.y,
+              originalScale: 1,
+              targetScale: 1,
+              originalColor: material.color.getHex(),
+              isHovered: false,
+              pulsePhase: Math.random() * Math.PI * 2
+            };
+
+            scene.add(mesh);
+            floatingShapes.push(mesh);
+          }
+        }
+
+        // Create particle cloud
+        function createParticles() {
+          const particleCount = 400;
+          const positions = new Float32Array(particleCount * 3);
+          const particleColors = new Float32Array(particleCount * 3);
+          const sizes = new Float32Array(particleCount);
+
+          const color1 = new THREE.Color(0x4F46E5);
+          const color2 = new THREE.Color(0x06B6D4);
+
+          for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 100;
+            positions[i * 3 + 1] = (Math.random() - 0.5) * 60;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 50 - 15;
+
+            const mixRatio = Math.random();
+            const mixedColor = color1.clone().lerp(color2, mixRatio);
+            particleColors[i * 3] = mixedColor.r;
+            particleColors[i * 3 + 1] = mixedColor.g;
+            particleColors[i * 3 + 2] = mixedColor.b;
+
+            sizes[i] = 0.1 + Math.random() * 0.2;
+          }
+
+          const geometry = new THREE.BufferGeometry();
+          geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+          geometry.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
+
+          const material = new THREE.PointsMaterial({
+            size: 0.18,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.7,
+            sizeAttenuation: true
+          });
+
+          const particleSystem = new THREE.Points(geometry, material);
+          scene.add(particleSystem);
+
+          return particleSystem;
+        }
+
+        // Create click explosion effect
+        function createClickExplosion(x, y, z) {
+          const particleCount = 30;
+          const explosionGroup = new THREE.Group();
+          explosionGroup.position.set(x, y, z);
+
+          const colorArray = [0x4F46E5, 0x06B6D4, 0x10B981, 0x8B5CF6, 0xFFFFFF];
+
+          for (let i = 0; i < particleCount; i++) {
+            const geometry = new THREE.SphereGeometry(0.1, 8, 8);
+            const material = new THREE.MeshBasicMaterial({
+              color: colorArray[Math.floor(Math.random() * colorArray.length)],
+              transparent: true,
+              opacity: 1
+            });
+
+            const particle = new THREE.Mesh(geometry, material);
+
+            // Random velocity
+            particle.userData = {
+              velocity: new THREE.Vector3(
+                (Math.random() - 0.5) * 2,
+                (Math.random() - 0.5) * 2,
+                (Math.random() - 0.5) * 2
+              ),
+              life: 1.0,
+              decay: 0.02 + Math.random() * 0.02
+            };
+
+            explosionGroup.add(particle);
+          }
+
+          scene.add(explosionGroup);
+          clickParticles.push(explosionGroup);
+
+          // Remove after animation
+          setTimeout(() => {
+            scene.remove(explosionGroup);
+            const index = clickParticles.indexOf(explosionGroup);
+            if (index > -1) clickParticles.splice(index, 1);
+          }, 2000);
+        }
+
+        // Mouse tracking for parallax
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
+        heroSection.addEventListener('mousemove', (event) => {
+          const rect = heroSection.getBoundingClientRect();
+          mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+          mouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+          // Update mouse for raycasting
+          mouse.x = mouseX;
+          mouse.y = mouseY;
+        });
+
+        // Click handler for explosion effect
+        heroSection.addEventListener('click', (event) => {
+          const rect = heroSection.getBoundingClientRect();
+          mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+          mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+          raycaster.setFromCamera(mouse, camera);
+
+          // Check if clicked on a shape
+          const intersects = raycaster.intersectObjects(floatingShapes);
+
+          if (intersects.length > 0) {
+            const clickedShape = intersects[0].object;
+            const pos = clickedShape.position;
+
+            // Create explosion at shape position
+            createClickExplosion(pos.x, pos.y, pos.z);
+
+            // Animate the clicked shape
+            clickedShape.userData.targetScale = 1.5;
+            setTimeout(() => {
+              clickedShape.userData.targetScale = 1;
+            }, 300);
+
+            // Spin faster temporarily
+            clickedShape.userData.clickBoost = 0.1;
+          } else {
+            // Create explosion at ray intersection with z=0 plane
+            const point = new THREE.Vector3();
+            raycaster.ray.at(30, point);
+            createClickExplosion(point.x, point.y, point.z);
+          }
+        });
+
+        // Initialize scene
+        createFloatingShapes();
+        const particleSystem = createParticles();
+
+        // Animation loop
+        let time = 0;
+        function animate() {
+          requestAnimationFrame(animate);
+          time += 0.01;
+
+          // Smooth mouse following
+          targetX += (mouseX - targetX) * 0.05;
+          targetY += (mouseY - targetY) * 0.05;
+
+          // Camera parallax - more responsive
+          camera.position.x = targetX * 5;
+          camera.position.y = targetY * 3;
+          camera.lookAt(scene.position);
+
+          // Raycasting for hover detection
+          raycaster.setFromCamera(mouse, camera);
+          const intersects = raycaster.intersectObjects(floatingShapes);
+
+          // Reset previous hover
+          if (hoveredShape && (!intersects.length || intersects[0].object !== hoveredShape)) {
+            hoveredShape.userData.isHovered = false;
+            hoveredShape.userData.targetScale = 1;
+            hoveredShape.material.color.setHex(hoveredShape.userData.originalColor);
+            hoveredShape = null;
+            canvas.style.cursor = 'default';
+          }
+
+          // Apply new hover
+          if (intersects.length > 0) {
+            const shape = intersects[0].object;
+            if (!shape.userData.isHovered) {
+              shape.userData.isHovered = true;
+              shape.userData.targetScale = 1.3;
+              shape.material.color.setHex(colors.highlight);
+              hoveredShape = shape;
+              canvas.style.cursor = 'pointer';
+            }
+          }
+
+          // Animate floating shapes
+          floatingShapes.forEach((shape) => {
+            const userData = shape.userData;
+
+            // Rotation with click boost decay
+            const boost = userData.clickBoost || 0;
+            shape.rotation.x += userData.rotationSpeed.x + boost;
+            shape.rotation.y += userData.rotationSpeed.y + boost;
+            shape.rotation.z += userData.rotationSpeed.z;
+
+            if (userData.clickBoost) {
+              userData.clickBoost *= 0.95;
+              if (userData.clickBoost < 0.001) userData.clickBoost = 0;
+            }
+
+            // Gentle floating motion with pulse
+            const pulse = Math.sin(time * 2 + userData.pulsePhase) * 0.1;
+            shape.position.y = userData.originalY + Math.sin(time * userData.floatSpeed + userData.floatOffset) * 2;
+
+            // Smooth scale transition
+            const currentScale = shape.scale.x;
+            const targetScale = userData.targetScale + pulse;
+            const newScale = currentScale + (targetScale - currentScale) * 0.1;
+            shape.scale.set(newScale, newScale, newScale);
+
+            // Hover glow effect
+            if (userData.isHovered) {
+              shape.material.opacity = 0.7 + Math.sin(time * 8) * 0.2;
+            } else {
+              shape.material.opacity = 0.4 + Math.sin(time * 2 + userData.pulsePhase) * 0.15;
+            }
+          });
+
+          // Animate click particles
+          clickParticles.forEach((group) => {
+            group.children.forEach((particle) => {
+              particle.position.add(particle.userData.velocity);
+              particle.userData.velocity.multiplyScalar(0.96);
+              particle.userData.life -= particle.userData.decay;
+              particle.material.opacity = particle.userData.life;
+              particle.scale.multiplyScalar(0.98);
+            });
+          });
+
+          // Rotate particle system with wave
+          if (particleSystem) {
+            particleSystem.rotation.y += 0.0008;
+            particleSystem.rotation.x = Math.sin(time * 0.5) * 0.1;
+          }
+
+          renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        function handleResize() {
+          const width = heroSection.offsetWidth;
+          const height = heroSection.offsetHeight;
+
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+          renderer.setSize(width, height);
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        }
+
+        window.addEventListener('resize', handleResize);
+
+        // Start animation
+        animate();
+      })();
+    </script>
+
+    <!-- Three.js Features Section Animation -->
+    <script>
+      (function () {
+        const canvas = document.getElementById('threejs-features-canvas');
+        const featuresSection = document.querySelector('.features-section');
+        if (!canvas || !featuresSection) return;
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, featuresSection.offsetWidth / featuresSection.offsetHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setSize(featuresSection.offsetWidth, featuresSection.offsetHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        camera.position.z = 25;
+
+        // Medical/Healthcare themed colors
+        const colors = {
+          teal: 0x14B8A6,
+          cyan: 0x06B6D4,
+          indigo: 0x6366F1,
+          emerald: 0x10B981,
+          white: 0xFFFFFF
+        };
+
+        // Create floating crosses (medical symbol)
+        const floatingElements = [];
+
+        function createMedicalCross() {
+          const group = new THREE.Group();
+          const material = new THREE.MeshBasicMaterial({
+            color: colors.teal,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.6
+          });
+
+          // Vertical bar
+          const vGeom = new THREE.BoxGeometry(0.3, 1.2, 0.1);
+          const vMesh = new THREE.Mesh(vGeom, material);
+          group.add(vMesh);
+
+          // Horizontal bar
+          const hGeom = new THREE.BoxGeometry(1.2, 0.3, 0.1);
+          const hMesh = new THREE.Mesh(hGeom, material);
+          group.add(hMesh);
+
+          return group;
+        }
+
+        // Create DNA helix points
+        function createDNAHelix() {
+          const points1 = [];
+          const points2 = [];
+          const connectors = [];
+
+          for (let i = 0; i < 50; i++) {
+            const t = i * 0.3;
+            const x = Math.sin(t) * 2;
+            const y = t - 7.5;
+            const z = Math.cos(t) * 2;
+            points1.push(new THREE.Vector3(x, y, z));
+            points2.push(new THREE.Vector3(-x, y, -z));
+          }
+
+          const curve1 = new THREE.CatmullRomCurve3(points1);
+          const curve2 = new THREE.CatmullRomCurve3(points2);
+
+          const helixMat = new THREE.LineBasicMaterial({
+            color: colors.cyan,
+            transparent: true,
+            opacity: 0.4
+          });
+
+          const helix1 = new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve1.getPoints(100)), helixMat);
+          const helix2 = new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve2.getPoints(100)), helixMat.clone());
+          helix2.material.color.setHex(colors.emerald);
+
+          const helixGroup = new THREE.Group();
+          helixGroup.add(helix1);
+          helixGroup.add(helix2);
+
+          // Add connectors
+          const connectorMat = new THREE.LineBasicMaterial({
+            color: colors.white,
+            transparent: true,
+            opacity: 0.2
+          });
+
+          for (let i = 0; i < 50; i += 3) {
+            const p1 = points1[i];
+            const p2 = points2[i];
+            const lineGeom = new THREE.BufferGeometry().setFromPoints([p1, p2]);
+            const line = new THREE.Line(lineGeom, connectorMat);
+            helixGroup.add(line);
+          }
+
+          return helixGroup;
+        }
+
+        // Create multiple DNA helixes
+        const dnaHelixes = [];
+        for (let i = 0; i < 3; i++) {
+          const helix = createDNAHelix();
+          helix.position.set(
+            (Math.random() - 0.5) * 40,
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 20 - 10
+          );
+          helix.rotation.z = Math.random() * Math.PI;
+          helix.scale.setScalar(0.8 + Math.random() * 0.4);
+          helix.userData = {
+            rotationSpeed: 0.002 + Math.random() * 0.003,
+            floatSpeed: 0.5 + Math.random() * 0.5,
+            floatOffset: Math.random() * Math.PI * 2,
+            originalY: helix.position.y
+          };
+          scene.add(helix);
+          dnaHelixes.push(helix);
+        }
+
+        // Create floating medical crosses
+        for (let i = 0; i < 8; i++) {
+          const cross = createMedicalCross();
+          cross.position.set(
+            (Math.random() - 0.5) * 35,
+            (Math.random() - 0.5) * 20,
+            (Math.random() - 0.5) * 15 - 5
+          );
+          cross.rotation.set(
+            Math.random() * Math.PI,
+            Math.random() * Math.PI,
+            Math.random() * Math.PI
+          );
+          const colorArr = [colors.teal, colors.cyan, colors.emerald, colors.indigo];
+          cross.children.forEach(child => {
+            child.material = child.material.clone();
+            child.material.color.setHex(colorArr[Math.floor(Math.random() * colorArr.length)]);
+          });
+          cross.userData = {
+            rotationSpeed: {
+              x: (Math.random() - 0.5) * 0.01,
+              y: (Math.random() - 0.5) * 0.01,
+              z: (Math.random() - 0.5) * 0.01
+            },
+            floatSpeed: 0.3 + Math.random() * 0.5,
+            floatOffset: Math.random() * Math.PI * 2,
+            originalY: cross.position.y
+          };
+          scene.add(cross);
+          floatingElements.push(cross);
+        }
+
+        // Create subtle particle system
+        const particleCount = 150;
+        const particleGeometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const particleColors = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount; i++) {
+          positions[i * 3] = (Math.random() - 0.5) * 50;
+          positions[i * 3 + 1] = (Math.random() - 0.5) * 30;
+          positions[i * 3 + 2] = (Math.random() - 0.5) * 30 - 10;
+
+          // Gradient colors
+          const color = new THREE.Color().lerpColors(
+            new THREE.Color(colors.teal),
+            new THREE.Color(colors.cyan),
+            Math.random()
+          );
+          particleColors[i * 3] = color.r;
+          particleColors[i * 3 + 1] = color.g;
+          particleColors[i * 3 + 2] = color.b;
+        }
+
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particleGeometry.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
+
+        const particleMaterial = new THREE.PointsMaterial({
+          size: 0.08,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.5
+        });
+
+        const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+        scene.add(particleSystem);
+
+        // Animation
+        let time = 0;
+        function animate() {
+          requestAnimationFrame(animate);
+          time += 0.01;
+
+          // Animate DNA helixes
+          dnaHelixes.forEach((helix) => {
+            helix.rotation.y += helix.userData.rotationSpeed;
+            helix.position.y = helix.userData.originalY + Math.sin(time * helix.userData.floatSpeed + helix.userData.floatOffset) * 1;
+          });
+
+          // Animate medical crosses
+          floatingElements.forEach((element) => {
+            element.rotation.x += element.userData.rotationSpeed.x;
+            element.rotation.y += element.userData.rotationSpeed.y;
+            element.rotation.z += element.userData.rotationSpeed.z;
+            element.position.y = element.userData.originalY + Math.sin(time * element.userData.floatSpeed + element.userData.floatOffset) * 1.5;
+          });
+
+          // Gentle particle movement
+          particleSystem.rotation.y += 0.0003;
+          particleSystem.rotation.x = Math.sin(time * 0.3) * 0.05;
+
+          renderer.render(scene, camera);
+        }
+
+        // Handle resize
+        function handleResize() {
+          const width = featuresSection.offsetWidth;
+          const height = featuresSection.offsetHeight;
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+          renderer.setSize(width, height);
+        }
+
+        window.addEventListener('resize', handleResize);
+
+        // Start animation
+        animate();
+      })();
+    </script>
+
+    <!-- Feature Carousel Navigation Controls -->
+    <script>
+      (function () {
+        const featuresGrid = document.querySelector('.features-grid');
+        const featuresWrapper = document.querySelector('.features-marquee-wrapper');
+        const prevBtn = document.getElementById('feature-prev');
+        const nextBtn = document.getElementById('feature-next');
+        const uniqueCards = 5; // Only count original cards, not duplicates
+
+        if (!featuresGrid || !prevBtn || !nextBtn || !featuresWrapper) return;
+
+        let currentIndex = 0;
+        let isStepMode = false;
+        let resumeTimeout = null;
+        const cardWidth = 280; // Card min-width
+        const gap = 32; // 2rem gap
+
+        // Calculate how many cards are visible at once
+        function getVisibleCards() {
+          return Math.floor(featuresWrapper.offsetWidth / (cardWidth + gap)) || 1;
+        }
+
+        // Get current transform X position from animation
+        function getCurrentTransformX() {
+          const style = window.getComputedStyle(featuresGrid);
+          const matrix = style.transform;
+          if (matrix === 'none') return 0;
+
+          // Parse matrix(a, b, c, d, tx, ty) or matrix3d(...)
+          const matrixValues = matrix.match(/matrix.*\((.+)\)/);
+          if (!matrixValues) return 0;
+
+          const values = matrixValues[1].split(', ');
+          // For matrix(), tx is the 5th value (index 4)
+          // For matrix3d(), tx is the 13th value (index 12)
+          const tx = values.length === 6 ? parseFloat(values[4]) : parseFloat(values[12]);
+          return tx || 0;
+        }
+
+        // Enter step mode (pause marquee, enable navigation)
+        function enterStepMode() {
+          if (isStepMode) return;
+          isStepMode = true;
+          clearTimeout(resumeTimeout);
+
+          // Get current exact position from animation
+          const currentX = getCurrentTransformX();
+          const cardStep = cardWidth + gap;
+
+          // Calculate which card is closest (for navigation tracking)
+          currentIndex = Math.round(Math.abs(currentX) / cardStep);
+          currentIndex = Math.max(0, Math.min(currentIndex, uniqueCards - 1));
+
+          // Add step-mode class to disable animation and enable transitions
+          featuresGrid.classList.add('step-mode');
+
+          // Keep exact position (freeze in place)
+          featuresGrid.style.transform = `translateX(${currentX}px)`;
+
+          updateButtonStates();
+        }
+
+        // Exit step mode (resume marquee)
+        function exitStepMode() {
+          if (!isStepMode) return;
+
+          // Delay before resuming to allow user to click buttons
+          resumeTimeout = setTimeout(() => {
+            isStepMode = false;
+            currentIndex = 0;
+            featuresGrid.classList.remove('step-mode');
+            featuresGrid.style.transform = '';
+          }, 500);
+        }
+
+        // Update button opacity based on position (always active for infinite carousel)
+        function updateButtonStates() {
+          // Both buttons always active in infinite mode
+          prevBtn.style.opacity = '1';
+          prevBtn.style.cursor = 'pointer';
+          nextBtn.style.opacity = '1';
+          nextBtn.style.cursor = 'pointer';
+        }
+
+        // Navigate to position (with wrap-around for infinite carousel)
+        function goToIndex(index) {
+          const maxIndex = uniqueCards - 1;
+
+          // Wrap around for infinite carousel
+          if (index < 0) {
+            currentIndex = maxIndex;
+          } else if (index > maxIndex) {
+            currentIndex = 0;
+          } else {
+            currentIndex = index;
+          }
+
+          featuresGrid.style.transform = `translateX(-${currentIndex * (cardWidth + gap)}px)`;
+          updateButtonStates();
+        }
+
+        // Button hover - enter step mode
+        prevBtn.addEventListener('mouseenter', enterStepMode);
+        nextBtn.addEventListener('mouseenter', enterStepMode);
+
+        // Button leave - try to exit step mode
+        prevBtn.addEventListener('mouseleave', exitStepMode);
+        nextBtn.addEventListener('mouseleave', exitStepMode);
+
+        // Navigate on click (infinite - always works)
+        prevBtn.addEventListener('click', () => {
+          goToIndex(currentIndex - 1);
+        });
+
+        nextBtn.addEventListener('click', () => {
+          goToIndex(currentIndex + 1);
+        });
+
+        // Update on resize
+        window.addEventListener('resize', () => {
+          if (isStepMode) {
+            goToIndex(currentIndex);
+          }
+        });
+      })();
+    </script>
+    <!-- Scroll Reveal Animation (Repeatable) -->
+    <script>
+      (function () {
+        // Get all feature cards
+        const featureCards = document.querySelectorAll('.feature-card');
+        const featuresSection = document.querySelector('.features-section');
+
+        // Get dashboard elements
+        const dashboardSection = document.querySelector('.dashboard');
+        const dashboardTable = document.querySelector('.dashboard table');
+
+        // Create Intersection Observer for features (repeatable)
+        const featuresObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              // Add revealed class when scrolling into view
+              featureCards.forEach((card) => {
+                card.classList.add('scroll-revealed');
+              });
+            } else {
+              // Remove class when scrolling out of view (top) so it animates again
+              featureCards.forEach((card) => {
+                card.classList.remove('scroll-revealed');
+              });
+            }
+          });
+        }, {
+          threshold: 0.1,
+          rootMargin: '0px 0px -50px 0px'
+        });
+
+        // Create Intersection Observer for dashboard (repeatable)
+        const dashboardObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              // Add revealed class when scrolling into view
+              if (dashboardTable) {
+                dashboardTable.classList.add('scroll-revealed');
+              }
+              const title = entry.target.querySelector('.section-title');
+              if (title) {
+                title.classList.add('scroll-revealed');
+              }
+            } else {
+              // Remove class when scrolling out of view so it animates again
+              if (dashboardTable) {
+                dashboardTable.classList.remove('scroll-revealed');
+              }
+              const title = entry.target.querySelector('.section-title');
+              if (title) {
+                title.classList.remove('scroll-revealed');
+              }
+            }
+          });
+        }, {
+          threshold: 0.1,
+          rootMargin: '0px 0px -80px 0px'
+        });
+
+        // Observe sections (continuously)
+        if (featuresSection && featureCards.length) {
+          featuresObserver.observe(featuresSection);
+        }
+        if (dashboardSection) {
+          dashboardObserver.observe(dashboardSection);
+        }
+      })();
     </script>
 
 </body>
