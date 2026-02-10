@@ -214,7 +214,7 @@
     /* 5. HERO SECTION */
     .hero {
       text-align: center;
-      padding: 6rem 1rem;
+      padding: 6rem 1rem 5rem;
       background: radial-gradient(circle at top right, #E0E7FF 0%, transparent 40%),
         radial-gradient(circle at bottom left, #CCFBF1 0%, transparent 40%),
         var(--bg-body);
@@ -222,7 +222,8 @@
       position: relative;
       min-height: 100vh;
       min-height: 100dvh;
-      /* Full viewport height – dvh accounts for mobile browser chrome */
+      min-height: -webkit-fill-available;
+      /* Full viewport height – multiple fallbacks for mobile browser chrome */
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -954,6 +955,18 @@
       h2.section-title {
         font-size: 1.6rem;
         margin-bottom: 1.5rem;
+      }
+
+      /* Mobile Hero – fill entire visible screen */
+      .hero {
+        min-height: 100vh;
+        min-height: 100dvh;
+        min-height: -webkit-fill-available;
+        padding-bottom: 6rem;
+      }
+
+      .scroll-indicator {
+        bottom: 1.5rem;
       }
     }
 
