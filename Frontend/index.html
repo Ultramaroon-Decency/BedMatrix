@@ -214,16 +214,14 @@
     /* 5. HERO SECTION */
     .hero {
       text-align: center;
-      padding: 6rem 1rem 5rem;
+      padding: 6rem 1rem 4rem;
       background: radial-gradient(circle at top right, #E0E7FF 0%, transparent 40%),
         radial-gradient(circle at bottom left, #CCFBF1 0%, transparent 40%),
         var(--bg-body);
       overflow: hidden;
       position: relative;
-      min-height: 100vh;
-      min-height: 100dvh;
-      min-height: -webkit-fill-available;
-      /* Full viewport height – multiple fallbacks for mobile browser chrome */
+      height: 100vh;
+      /* Force hero to fill the entire viewport */
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -957,16 +955,14 @@
         margin-bottom: 1.5rem;
       }
 
-      /* Mobile Hero – fill entire visible screen */
+      /* Mobile Hero – full screen with extra bottom space for system nav */
       .hero {
-        min-height: 100vh;
-        min-height: 100dvh;
-        min-height: -webkit-fill-available;
-        padding-bottom: 6rem;
+        height: 100vh;
+        padding-bottom: 5rem;
       }
 
       .scroll-indicator {
-        bottom: 1.5rem;
+        bottom: 2.5rem;
       }
     }
 
