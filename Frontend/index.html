@@ -122,11 +122,21 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
+      position: fixed;
       top: 0;
+      left: 0;
+      right: 0;
       z-index: 1000;
       border-bottom: 1px solid rgba(255, 255, 255, 0.3);
       box-shadow: var(--shadow-sm);
+      transform: translateY(-100%);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    nav.nav-visible {
+      transform: translateY(0);
+      opacity: 1;
     }
 
     nav h1 {
@@ -210,8 +220,8 @@
         var(--bg-body);
       overflow: hidden;
       position: relative;
-      min-height: calc(100vh - 70px);
-      /* Full viewport minus navbar */
+      min-height: 100vh;
+      /* Full viewport height */
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -2869,6 +2879,27 @@
         if (dashboardSection) {
           dashboardObserver.observe(dashboardSection);
         }
+      })();
+
+      // Navbar scroll visibility
+      (function () {
+        const nav = document.querySelector('nav');
+        const heroSection = document.querySelector('.hero');
+
+        function handleScroll() {
+          // Show navbar after scrolling past 100px
+          if (window.scrollY > 100) {
+            nav.classList.add('nav-visible');
+          } else {
+            nav.classList.remove('nav-visible');
+          }
+        }
+
+        // Initial check
+        handleScroll();
+
+        // Listen for scroll
+        window.addEventListener('scroll', handleScroll, { passive: true });
       })();
     </script>
 
